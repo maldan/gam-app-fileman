@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <!-- Header -->
-    <Header :path="path" @update="path = $event" @refresh="refresh()" />
+    <Header :path="path" @update="path = fixPath($event)" @refresh="refresh()" />
 
     <!-- Preload -->
     <div v-if="isLoading" class="body">
@@ -24,7 +24,7 @@
         :item="x"
         :isOdd="i % 2 === 1"
         :path="path"
-        @update="path = $event"
+        @update="path = fixPath($event)"
         @refresh="refresh()"
       />
     </div>
@@ -44,6 +44,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { RestApi } from '../util/RestApi';
+import { Helper } from '../util/Helper';
 import IconButton from '../component/IconButton.vue';
 import Path from '../component/Path.vue';
 import Item from '../component/Item.vue';
@@ -60,6 +61,7 @@ export default defineComponent({
     },
   },
   methods: {
+    fixPath: Helper.fixPath,
     async refresh() {
       this.isLoading = true;
       try {
@@ -70,7 +72,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      path: 'G:',
+      path: '/',
       list: [],
       isLoading: false,
     };
