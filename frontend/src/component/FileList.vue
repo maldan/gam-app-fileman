@@ -6,7 +6,7 @@
         @click="back()"
         src="../asset/back.svg"
         alt=""
-        style="margin-right: 20px"
+        style="margin-right: 10px"
         draggable="false"
       />
       <input type="text" @change="$emit('update:path', $event.target.value)" :value="path" />
@@ -29,7 +29,7 @@
       <div @click="go(x)" class="clickable" :class="$style.file" v-for="x in files" :key="x.name">
         <img :src="iconByFile(x)" alt="Folder" draggable="false" />
         <div :class="$style.name">{{ x.name }}</div>
-        <div :class="$style.size">{{ x.size }}</div>
+        <div :class="$style.size">{{ pretty(x.size) }}</div>
         <div :class="$style.created">{{ $root.moment(x.created).fromNow() }}</div>
       </div>
     </div>
@@ -39,6 +39,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { RestApi } from '../util/RestApi';
+import PrettyBytes from 'pretty-bytes';
 
 export default defineComponent({
   props: {
@@ -54,12 +55,17 @@ export default defineComponent({
         return;
       }
       const w = (this.$refs['file_list'] as any).getBoundingClientRect().width;
-      if (w < 600) {
-        this.maxRows = 4;
+
+      if (w < 300) {
+        this.maxRows = 2;
       } else if (w < 400) {
         this.maxRows = 3;
-      } else {
+      } else if (w < 600) {
+        this.maxRows = 4;
+      } else if (w < 900) {
         this.maxRows = 5;
+      } else {
+        this.maxRows = 6;
       }
     }, 16);
   },
@@ -72,6 +78,7 @@ export default defineComponent({
     },
   },
   methods: {
+    pretty: PrettyBytes,
     async refresh() {
       this.isLoading = true;
       const all = await RestApi.file.getList(this.path + '');
@@ -100,12 +107,15 @@ export default defineComponent({
     },
     go(file: any) {
       if (file.kind !== 'dir') {
+        RestApi.file.open(this.path + '/' + file.name);
         return;
       }
       this.$emit('update:path', (this.path + '/' + file.name).replace(/\/\//g, '/'));
     },
     iconByFile(file: any) {
+      // @ts-ignore
       if (file.kind === 'file') return require('../asset/file.svg');
+      // @ts-ignore
       return require('../asset/folder.svg');
     },
   },
@@ -122,8 +132,8 @@ export default defineComponent({
 
 <style lang="scss" module>
 .body {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 10px;
+  // background: rgba(0, 0, 0, 0.3);
+  // padding: 10px;
   flex: 1;
 
   .header {
@@ -133,10 +143,10 @@ export default defineComponent({
 
     input {
       flex: 1;
-      padding: 5px 10px;
-      background: rgba(255, 255, 255, 0.15);
+      padding: 4px 8px;
+      background: #23232373;
       border: 0;
-      border-radius: 4px;
+      border-radius: 2px;
       outline: none;
       color: #a5a5a5;
       font-size: 16px;
@@ -153,6 +163,8 @@ export default defineComponent({
       display: flex;
       padding: 10px;
       align-items: center;
+      background: #23232373;
+      border-bottom: 1px solid #ffffff21;
 
       img {
         width: 32px;
@@ -217,6 +229,7 @@ export default defineComponent({
       align-items: center;
       width: 100%;
       height: 100%;
+      background: #23232373;
 
       img {
         display: block;

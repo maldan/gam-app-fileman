@@ -7,5 +7,8 @@ export const RestApi = {
     async getList(path: string) {
       return (await Axios.get(`${API_URL}/file/list?path=${path}`)).data.response;
     },
+    async open(path: string) {
+      return (await Axios.post(`${API_URL}/file/open?path=${path}`)).data.response;
+    },
   },
 };
