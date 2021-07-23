@@ -1,60 +1,42 @@
 <template>
   <div class="main">
-    <div class="header">
-      <img
-        class="clickable"
-        @click="back()"
-        src="../asset/back.svg"
-        alt=""
-        style="margin-right: 10px"
-        draggable="false"
-      />
-      <input type="text" @change="$emit('update:path', $event.target.value)" :value="path" />
+    <!-- Header -->
+    <Header :path="path" @update="path = $event" @refresh="refresh()" />
 
-      <img class="clickable" src="../asset/mode.svg" alt="" style="" draggable="false" />
-
-      <img
-        class="clickable"
-        @click="isTileMode = !isTileMode"
-        src="../asset/mode.svg"
-        alt=""
-        style=""
-        draggable="false"
-      />
-      <img
-        class="clickable"
-        @click="isSplit = !isSplit"
-        src="../asset/split.svg"
-        alt=""
-        style=""
-        draggable="false"
-      />
-      <img class="clickable" src="../asset/settings.svg" alt="" draggable="false" />
+    <!-- Preload -->
+    <div v-if="isLoading" class="body">
+      <div style="padding: 10px; display: flex; align-items: center">
+        Loading...
+        <img
+          class="rotating"
+          src="../asset/preload.svg"
+          alt=""
+          style="width: 24px; margin-left: 10px"
+        />
+      </div>
     </div>
-    <div class="body">
-      <!-- <FileList v-model:path="path_1" :mode="isTileMode ? 'tile' : 'list'" />
-      <div class="gap" v-if="isSplit">
-        <img class="clickable" src="../asset/back.svg" alt="" draggable="false" />
-      </div>
-      <FileList v-if="isSplit" v-model:path="path_2" :mode="isTileMode ? 'tile' : 'list'" /> -->
 
-      <!-- Tile mode -->
-      <div
-        v-if="mode === 'tile' && !isLoading"
-        ref="file_list"
-        :class="[$style.file_tile, $style[`g${maxRows}`]]"
-      >
-        <div :class="$style.file" v-for="x in files" :key="x.name">
-          <img
-            @click="go(x)"
-            class="clickable"
-            :src="iconByFile(x)"
-            alt="Folder"
-            draggable="false"
-          />
-          <div :class="$style.name">{{ x.name }}</div>
-        </div>
-      </div>
+    <!-- File list -->
+    <div v-if="!isLoading" class="body">
+      <Item
+        v-for="(x, i) in list"
+        :key="x.name"
+        :item="x"
+        :isOdd="i % 2 === 1"
+        :path="path"
+        @update="path = $event"
+        @refresh="refresh()"
+      />
+    </div>
+
+    <div
+      class="preview"
+      v-for="(x, i) in list.filter((x) => x.isSelected && x.name.match(/\.(png|jpeg|gif|jpg)$/))"
+      :key="x.name"
+      :style="{ left: i * (164 + 10) + 10 + 'px' }"
+    >
+      {{ x.name }}
+      <img :src="$root.API_URL + `/file/file?path=${path}/${x.name}`" style="width: 100%" />
     </div>
   </div>
 </template>
@@ -62,10 +44,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { RestApi } from '../util/RestApi';
-import FileList from '../component/FileList.vue';
+import IconButton from '../component/IconButton.vue';
+import Path from '../component/Path.vue';
+import Item from '../component/Item.vue';
+import Header from '../component/Header.vue';
 
 export default defineComponent({
-  components: { FileList },
+  components: { IconButton, Path, Item, Header },
   async mounted() {
     this.refresh();
   },
@@ -75,13 +60,19 @@ export default defineComponent({
     },
   },
   methods: {
-    async refresh() {},
+    async refresh() {
+      this.isLoading = true;
+      try {
+        this.list = await RestApi.file.getList(this.path);
+      } catch {}
+      this.isLoading = false;
+    },
   },
   data: () => {
     return {
-      path: 'D:/',
-      isSplit: false,
-      isTileMode: true,
+      path: 'G:',
+      list: [],
+      isLoading: false,
     };
   },
 });
@@ -89,41 +80,44 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .main {
-  padding: 10px;
+  // padding: 10px;
   height: 100%;
   box-sizing: border-box;
 
   .header {
     display: flex;
-    margin-bottom: 15px;
+    // margin-bottom: 15px;
     justify-content: flex-end;
+    background: #1d1d1d;
+    padding: 10px;
+    box-sizing: border-box;
 
-    img {
-      margin-left: 15px;
-    }
-
-    input {
-      flex: 1;
-      padding: 4px 8px;
-      background: #23232373;
-      border: 0;
-      border-radius: 2px;
-      outline: none;
-      color: #a5a5a5;
-      font-size: 16px;
+    .selected_files {
+      padding: 3px 10px;
+      background: #2c589e;
+      color: #b5b5b5;
+      border-radius: 3px;
+      margin-right: 15px;
     }
   }
 
   .body {
     display: flex;
-    height: calc(100% - 35px);
+    height: calc(100% - 55px);
+    flex-direction: column;
+    overflow-y: auto;
+  }
 
-    .gap {
-      width: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  .preview {
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    width: 164px;
+    height: 164px;
+    background: rgba(0, 0, 0, 0.5);
+    font-size: 12px;
+    color: #cecece;
+    overflow: hidden;
   }
 }
 </style>

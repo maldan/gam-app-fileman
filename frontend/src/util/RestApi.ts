@@ -10,5 +10,39 @@ export const RestApi = {
     async open(path: string) {
       return (await Axios.post(`${API_URL}/file/open?path=${path}`)).data.response;
     },
+    async rename(from: string, to: string) {
+      return (
+        await Axios.post(`${API_URL}/file/rename`, {
+          from,
+          to,
+        })
+      ).data.response;
+    },
+    async createFolder(path: string) {
+      return (await Axios.post(`${API_URL}/file/file?path=${path}`)).data.response;
+    },
+    async createFile(path: string) {
+      return (await Axios.post(`${API_URL}/file/folder?path=${path}`)).data.response;
+    },
+    async deleteFile(path: string) {
+      return (await Axios.delete(`${API_URL}/file/file?path=${path}`)).data.response;
+    },
+    async deleteFolder(path: string) {
+      return (await Axios.delete(`${API_URL}/file/folder?path=${path}`)).data.response;
+    },
+
+    async uploadFile(path: string, file: File, onProgess: (s: any) => void): Promise<string> {
+      const formData = new FormData();
+      formData.append(`file`, file, file.name);
+
+      return (
+        await Axios.post(`${API_URL}/file/file?path=${path}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: onProgess,
+        })
+      ).data.response;
+    },
   },
 };
