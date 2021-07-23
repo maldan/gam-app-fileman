@@ -1,7 +1,14 @@
 <template>
   <div class="path">
-    <input v-if="mode === 'string'" type="text" :value="value" />
-    <div v-if="mode !== 'string'" style="display: flex">
+    <IconButton @click="isEditMode = !isEditMode" icon="pencil" style="margin-right: 15px" />
+    <input
+      v-if="isEditMode"
+      type="text"
+      :value="value"
+      @change="$emit('update', $event.target.value)"
+    />
+    <div v-if="!isEditMode" style="display: flex">
+      <div @click="$emit('update', '/')" class="part clickable">/</div>
       <div
         @click="go(i)"
         class="part clickable"
@@ -16,23 +23,24 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import IconButton from '../component/IconButton.vue';
 
 export default defineComponent({
   props: {
     icon: String,
     value: String,
   },
-  components: {},
+  components: { IconButton },
   async mounted() {},
   methods: {
     go(i: number) {
       const tt = this.value?.split('/').filter((x) => Boolean(x)) || [];
-      this.$emit('update', tt.slice(0, i + 1).join('/'));
+      this.$emit('update', '/' + tt.slice(0, i + 1).join('/'));
     },
   },
   data: () => {
     return {
-      mode: 's',
+      isEditMode: false,
     };
   },
 });
@@ -40,6 +48,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .path {
+  display: flex;
+  align-items: center;
+
   input {
     flex: 1;
     padding: 4px 8px;

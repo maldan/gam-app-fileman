@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <IconButton @click="back()" icon="back" style="margin-right: 10px" />
+    <IconButton @click="back()" icon="back" style="margin-right: 15px" />
 
     <Path @update="$emit('update', $event)" :value="path" style="flex: 1" />
 
