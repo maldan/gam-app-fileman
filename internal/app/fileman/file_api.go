@@ -75,7 +75,7 @@ func (f FileApi) PostOpen(args Path) {
 	)
 }
 
-// Add new file
+// Add new file sx
 func (r FileApi) PostFile(args CreateFile) {
 	if len(args.Files) > 0 {
 		cmhp_file.WriteBin(args.Path, args.Files[0])
