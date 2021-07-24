@@ -7,6 +7,9 @@ export const RestApi = {
     async getList(path: string) {
       return (await Axios.get(`${API_URL}/file/list?path=${path}`)).data.response;
     },
+    async getDirSize(path: string): Promise<number> {
+      return (await Axios.get(`${API_URL}/file/dirSize?path=${path}`)).data.response;
+    },
     async open(path: string) {
       return (await Axios.post(`${API_URL}/file/open?path=${path}`)).data.response;
     },
@@ -18,19 +21,18 @@ export const RestApi = {
         })
       ).data.response;
     },
-    async createFolder(path: string) {
-      return (await Axios.post(`${API_URL}/file/file?path=${path}`)).data.response;
+    async createDir(path: string) {
+      return (await Axios.post(`${API_URL}/file/dir?path=${path}`)).data.response;
     },
     async createFile(path: string) {
-      return (await Axios.post(`${API_URL}/file/folder?path=${path}`)).data.response;
+      return (await Axios.post(`${API_URL}/file/file?path=${path}`)).data.response;
     },
     async deleteFile(path: string) {
       return (await Axios.delete(`${API_URL}/file/file?path=${path}`)).data.response;
     },
-    async deleteFolder(path: string) {
-      return (await Axios.delete(`${API_URL}/file/folder?path=${path}`)).data.response;
+    async deleteDir(path: string) {
+      return (await Axios.delete(`${API_URL}/file/dir?path=${path}`)).data.response;
     },
-
     async uploadFile(path: string, file: File, onProgess: (s: any) => void): Promise<string> {
       const formData = new FormData();
       formData.append(`file`, file, file.name);

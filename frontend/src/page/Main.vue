@@ -3,21 +3,11 @@
     <!-- Header -->
     <Header :path="path" @update="path = fixPath($event)" @refresh="refresh()" />
 
-    <!-- Preload -->
-    <div v-if="isLoading" class="body">
-      <div style="padding: 10px; display: flex; align-items: center">
-        Loading...
-        <img
-          class="rotating"
-          src="../asset/preload.svg"
-          alt=""
-          style="width: 24px; margin-left: 10px"
-        />
-      </div>
-    </div>
+    <!-- Empty body -->
+    <div v-show="isLoading" class="body"></div>
 
     <!-- File list -->
-    <div v-if="!isLoading" class="body">
+    <div v-show="!isLoading" class="body">
       <Item
         v-for="(x, i) in list"
         :key="x.name"
@@ -29,15 +19,39 @@
       />
     </div>
 
+    <!-- Preview -->
     <div
       class="preview"
-      v-for="(x, i) in list.filter((x) => x.isSelected && x.name.match(/\.(png|jpeg|gif|jpg)$/))"
+      v-for="(x, i) in list.filter(
+        (x) => x.isSelected && x.name.match(/\.(png|jpeg|gif|jpg|mp4)$/),
+      )"
       :key="x.name"
       :style="{ left: i * (164 + 10) + 10 + 'px' }"
     >
       {{ x.name }}
-      <img :src="$root.API_URL + `/file/file?path=${path}/${x.name}`" style="width: 100%" />
+      <img
+        v-if="x.name.match(/\.(png|jpeg|gif|jpg)$/)"
+        :src="$root.API_URL + `/file/file?path=${path}/${x.name}`"
+        style="width: 100%"
+      />
+      <img
+        v-if="x.name.match(/\.(mp4)$/)"
+        :src="$root.API_URL + `/file/videoThumbnail?path=${path}/${x.name}`"
+        style="width: 100%"
+      />
     </div>
+
+    <!-- Bottom -->
+    <Bottom
+      :isLoading="isLoading"
+      :path="path"
+      :list="list"
+      :sort="sortBy"
+      @changeSort="sortBy = $event"
+      @update="path = fixPath($event)"
+      @refresh="refresh()"
+      @du="du()"
+    />
   </div>
 </template>
 
@@ -49,9 +63,10 @@ import IconButton from '../component/IconButton.vue';
 import Path from '../component/Path.vue';
 import Item from '../component/Item.vue';
 import Header from '../component/Header.vue';
+import Bottom from '../component/Bottom.vue';
 
 export default defineComponent({
-  components: { IconButton, Path, Item, Header },
+  components: { IconButton, Path, Item, Header, Bottom },
   async mounted() {
     this.refresh();
   },
@@ -65,15 +80,50 @@ export default defineComponent({
     async refresh() {
       this.isLoading = true;
       try {
-        this.list = await RestApi.file.getList(this.path);
+        const list = await RestApi.file.getList(this.path);
+        this.list = this.sort(list);
       } catch {}
       this.isLoading = false;
+    },
+    du() {
+      for (let i = 0; i < this.list.length; i++) {
+        if (this.list[i].kind === 'dir') {
+          this.list[i].size = 0;
+          this.getDirSize(this.list[i]);
+        }
+      }
+    },
+    async getDirSize(dir: any) {
+      dir.size = await RestApi.file.getDirSize(this.fixPath(this.path + '/' + dir.name));
+      this.list = this.sort(this.list);
+    },
+    sort(list: any[]): any[] {
+      let folders = list.filter((x) => x.kind === 'dir');
+      let files = list.filter((x) => x.kind !== 'dir');
+
+      if (this.sortBy === 'name') {
+        folders = folders.sort((a, b) => a.name.localeCompare(b.name));
+        files = files.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      if (this.sortBy === 'size') {
+        folders = folders.sort((a, b) => a.size - b.size);
+        files = files.sort((a, b) => a.size - b.size);
+      }
+      if (this.sortBy === 'created') {
+        folders = folders.sort(
+          (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
+        );
+        files = files.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
+      }
+
+      return [...folders, ...files];
     },
   },
   data: () => {
     return {
+      sortBy: 'name',
       path: '/',
-      list: [],
+      list: [] as any[],
       isLoading: false,
     };
   },
@@ -82,37 +132,19 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .main {
-  // padding: 10px;
   height: 100%;
   box-sizing: border-box;
 
-  .header {
-    display: flex;
-    // margin-bottom: 15px;
-    justify-content: flex-end;
-    background: #1d1d1d;
-    padding: 10px;
-    box-sizing: border-box;
-
-    .selected_files {
-      padding: 3px 10px;
-      background: #2c589e;
-      color: #b5b5b5;
-      border-radius: 3px;
-      margin-right: 15px;
-    }
-  }
-
   .body {
     display: flex;
-    height: calc(100% - 55px);
+    height: calc(100% - 45px - 40px);
     flex-direction: column;
     overflow-y: auto;
   }
 
   .preview {
     position: fixed;
-    bottom: 10px;
+    bottom: 50px;
     left: 0;
     width: 164px;
     height: 164px;
