@@ -5,6 +5,7 @@ import "time"
 type File struct {
 	Kind    string    `json:"kind"`
 	Name    string    `json:"name"`
+	User    string    `json:"user"`
 	Size    int64     `json:"size"`
 	Created time.Time `json:"created"`
 }

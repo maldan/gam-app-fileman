@@ -2,6 +2,7 @@
   <div @click="click()" class="item clickable" :class="isOdd ? 'odd' : ''">
     <img :src="icon(item)" alt="File" />
     <div class="name">{{ item.name }}</div>
+    <div v-if="!item.isSelected" class="user">{{ item.user }}</div>
     <div v-if="!item.isSelected" class="size">{{ $root.pretty(item.size) }}</div>
     <div v-if="!item.isSelected" class="created">
       {{ $root.moment(item.created).format('YYYY-MM-DD HH:mm:ss') }}
@@ -65,7 +66,7 @@ export default defineComponent({
       if (confirm(`Are you sure? Delete ${this.path}/${this.item?.name}`)) {
         if (this.item?.kind === 'dir') {
           if (prompt('Enter "sasageo" to approve action') === 'sasageo') {
-            await RestApi.file.deleteFolder(this.path + '/' + this.item?.name);
+            await RestApi.file.deleteDir(this.path + '/' + this.item?.name);
           }
         } else {
           await RestApi.file.deleteFile(this.path + '/' + this.item?.name);
@@ -97,7 +98,6 @@ export default defineComponent({
     return {
       clickTime: 0,
       delay: new Date(),
-      //isSelected: false,
     };
   },
 });
@@ -109,6 +109,7 @@ export default defineComponent({
   align-items: center;
   padding: 10px;
   color: #ababab;
+  font-size: 14px;
 
   img {
     display: block;
@@ -116,17 +117,31 @@ export default defineComponent({
 
   .name {
     margin-left: 10px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .user {
+    color: #8ab0f1;
+    flex: 0.2;
+    text-align: right;
+    padding-right: 15px;
   }
 
   .size {
-    margin-left: auto;
     color: #5eafa1;
     font-weight: bold;
+    text-align: right;
+    padding-right: 15px;
+    flex: none;
+    width: 65px;
   }
 
   .created {
     color: #fec700;
-    margin-left: 20px;
+    flex: none;
   }
 }
 
