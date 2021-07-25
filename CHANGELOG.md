@@ -1,3 +1,10 @@
+## [0.0.6] - 2021-06-25
+
+### Fixed
+-    Save path
+-    Image view
+-    Video video
+
 ## [0.0.5] - 2021-06-24
 
 ### Fixed
