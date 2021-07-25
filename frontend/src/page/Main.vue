@@ -16,6 +16,7 @@
         :path="path"
         @update="path = fixPath($event)"
         @refresh="refresh()"
+        @open="openFile"
       />
     </div>
 
@@ -52,6 +53,16 @@
       @refresh="refresh()"
       @du="du()"
     />
+
+    <!-- Views -->
+    <component
+      v-if="view"
+      :is="`view-${view}`"
+      @close="view = ''"
+      :list="list"
+      :path="path"
+      :file="selectedFile"
+    />
   </div>
 </template>
 
@@ -64,15 +75,20 @@ import Path from '../component/Path.vue';
 import Item from '../component/Item.vue';
 import Header from '../component/Header.vue';
 import Bottom from '../component/Bottom.vue';
+import ViewImage from '../component/view/Image.vue';
+import ViewVideo from '../component/view/Video.vue';
 
 export default defineComponent({
-  components: { IconButton, Path, Item, Header, Bottom },
+  components: { IconButton, Path, Item, Header, Bottom, ViewImage, ViewVideo },
   async mounted() {
+    this.path = await RestApi.file.getPath();
+
     this.refresh();
   },
   watch: {
-    path() {
+    async path() {
       this.refresh();
+      await RestApi.file.setPath(this.path);
     },
   },
   methods: {
@@ -91,6 +107,11 @@ export default defineComponent({
           this.list[i].size = 0;
           this.getDirSize(this.list[i]);
         }
+      }
+    },
+    unselectAll() {
+      for (let i = 0; i < this.list.length; i++) {
+        this.list[i].isSelected = false;
       }
     },
     async getDirSize(dir: any) {
@@ -118,6 +139,17 @@ export default defineComponent({
 
       return [...folders, ...files];
     },
+    openFile(path: string) {
+      this.selectedFile = path;
+      if (path.match(/\.(png|jpeg|gif|jpg)$/)) {
+        this.view = 'image';
+      }
+      if (path.match(/\.(mp4)$/)) {
+        this.view = 'video';
+      }
+
+      this.unselectAll();
+    },
   },
   data: () => {
     return {
@@ -125,6 +157,8 @@ export default defineComponent({
       path: '/',
       list: [] as any[],
       isLoading: false,
+      view: '',
+      selectedFile: '',
     };
   },
 });
@@ -140,6 +174,7 @@ export default defineComponent({
     height: calc(100% - 45px - 40px);
     flex-direction: column;
     overflow-y: auto;
+    position: relative;
   }
 
   .preview {

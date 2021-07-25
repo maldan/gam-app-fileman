@@ -46,5 +46,12 @@ export const RestApi = {
         })
       ).data.response;
     },
+
+    async getPath() {
+      return (await Axios.get(`${API_URL}/file/path?path`)).data.response;
+    },
+    async setPath(path: string) {
+      return (await Axios.post(`${API_URL}/file/path?path=${path}`)).data.response;
+    },
   },
 };

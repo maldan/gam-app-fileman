@@ -91,6 +91,8 @@ export default defineComponent({
     doubleClick() {
       if (this.item?.kind === 'dir') {
         this.$emit('update', this.path + '/' + this.item?.name);
+      } else {
+        this.$emit('open', this.path + '/' + this.item?.name);
       }
     },
   },

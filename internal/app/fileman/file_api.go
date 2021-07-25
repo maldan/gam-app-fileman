@@ -19,6 +19,18 @@ import (
 type FileApi struct {
 }
 
+// var CurrentPath = "/mnt/g/Maldan/Docs/manga/bulma_and_goku_eng"
+
+var CurrentPath = "/"
+
+func (r FileApi) GetPath() string {
+	return CurrentPath
+}
+
+func (r FileApi) PostPath(args Path) {
+	CurrentPath = args.Path
+}
+
 // Get video thumbnail
 func (f FileApi) GetVideoThumbnail(args Path) *os.File {
 	// Temp file
@@ -58,7 +70,7 @@ func (f FileApi) GetFile(args Path) *os.File {
 
 // Get file content
 func (f FileApi) GetDirSize(args Path) int64 {
-	out := cmhp_process.Exec("du", "-d", "0", args.Path)
+	out := cmhp_process.Exec("du", "-d", "0", "-b", args.Path)
 	i, _ := strconv.ParseInt(strings.Split(out, "\t")[0], 10, 64)
 	return i
 }
