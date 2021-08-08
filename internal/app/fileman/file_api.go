@@ -182,3 +182,13 @@ func (r FileApi) DeleteDir(args CreateFile) {
 	}
 	cmhp_file.DeleteDir(args.Path)
 }
+
+// Copy file
+func (r FileApi) PostCopy(args ArgsRename) {
+	cmhp_process.Exec("cp", "-r", args.From, args.To)
+}
+
+// Copy file
+func (r FileApi) PostMove(args ArgsRename) {
+	cmhp_process.Exec("mv", "-T", args.From, args.To)
+}

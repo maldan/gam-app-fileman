@@ -53,5 +53,23 @@ export const RestApi = {
     async setPath(path: string) {
       return (await Axios.post(`${API_URL}/file/path?path=${path}`)).data.response;
     },
+
+    async copy(from: string, to: string) {
+      return (
+        await Axios.post(`${API_URL}/file/copy`, {
+          from,
+          to,
+        })
+      ).data.response;
+    },
+
+    async move(from: string, to: string) {
+      return (
+        await Axios.post(`${API_URL}/file/move`, {
+          from,
+          to,
+        })
+      ).data.response;
+    },
   },
 };

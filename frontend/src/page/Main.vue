@@ -48,10 +48,17 @@
       :path="path"
       :list="list"
       :sort="sortBy"
+      :buffer="buffer"
+      :tab="tab"
+      :tabs="tabs"
       @changeSort="sortBy = $event"
       @update="path = fixPath($event)"
       @refresh="refresh()"
+      @paste="paste()"
       @du="du()"
+      @copy="(bufferPath = path), (copyMode = 'copy'), (buffer = list.filter((x) => x.isSelected))"
+      @cut="(bufferPath = path), (copyMode = 'cut'), (buffer = list.filter((x) => x.isSelected))"
+      @tab="selectTab($event)"
     />
 
     <!-- Views -->
@@ -81,12 +88,14 @@ import ViewVideo from '../component/view/Video.vue';
 export default defineComponent({
   components: { IconButton, Path, Item, Header, Bottom, ViewImage, ViewVideo },
   async mounted() {
+    this.selectTab(0);
     this.path = await RestApi.file.getPath();
 
     this.refresh();
   },
   watch: {
     async path() {
+      this.tab.path = this.path;
       this.refresh();
       await RestApi.file.setPath(this.path);
     },
@@ -100,6 +109,11 @@ export default defineComponent({
         this.list = this.sort(list);
       } catch {}
       this.isLoading = false;
+    },
+    selectTab(id: number) {
+      this.tab = this.tabs[id];
+      this.path = this.tab.path;
+      this.refresh();
     },
     du() {
       for (let i = 0; i < this.list.length; i++) {
@@ -150,6 +164,25 @@ export default defineComponent({
 
       this.unselectAll();
     },
+    async paste() {
+      this.isLoading = true;
+      for (let i = 0; i < this.buffer.length; i++) {
+        if (this.copyMode === 'copy') {
+          await RestApi.file.copy(
+            this.bufferPath + '/' + this.buffer[i].name,
+            this.path + '/' + this.buffer[i].name,
+          );
+        } else {
+          await RestApi.file.move(
+            this.bufferPath + '/' + this.buffer[i].name,
+            this.path + '/' + this.buffer[i].name,
+          );
+        }
+      }
+      this.isLoading = false;
+      this.buffer = [];
+      this.refresh();
+    },
   },
   data: () => {
     return {
@@ -159,6 +192,11 @@ export default defineComponent({
       isLoading: false,
       view: '',
       selectedFile: '',
+      copyMode: 'copy',
+      bufferPath: '',
+      buffer: [] as any[],
+      tab: null as any,
+      tabs: [{ path: '/' }, { path: '/' }, { path: '/' }],
     };
   },
 });
