@@ -10,6 +10,7 @@
       style="width: 16px; margin-right: 20px"
     />
 
+    <!-- Tabs -->
     <div style="margin-right: auto; display: flex">
       <div
         v-for="(x, i) in tabs"

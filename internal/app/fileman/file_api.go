@@ -35,7 +35,7 @@ func (r FileApi) PostPath(args Path) {
 func (f FileApi) GetVideoThumbnail(args Path) *os.File {
 	// Temp file
 	os.MkdirAll(os.TempDir()+"/video_preview/", 0777)
-	tmpFile := os.TempDir() + "/video_preview/" + cmhp_crypto.Sha1(args.Path) + ".jpeg"
+	tmpFile := os.TempDir() + "/video_preview/" + cmhp_crypto.Sha1(args.Path) + ".webp"
 
 	// If file exists
 	if cmhp_file.Exists(tmpFile) {
@@ -49,8 +49,33 @@ func (f FileApi) GetVideoThumbnail(args Path) *os.File {
 	// Generate preview
 	cmhp_process.Exec("ffmpeg",
 		"-i", args.Path, "-vf",
-		"select=eq(n\\,100)", "-frames:v", "1",
-		"-s", "256x256", tmpFile, "-y")
+		"select=eq(n\\,320)", "-frames:v", "1",
+		"-s", "80x80", tmpFile, "-y")
+
+	f1, err1 := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
+	if err1 != nil {
+		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err1.Error())
+	}
+	return f1
+}
+
+// Get image thumbnail
+func (f FileApi) GetImageThumbnail(args Path) *os.File {
+	// Temp file
+	os.MkdirAll(os.TempDir()+"/image_preview/", 0777)
+	tmpFile := os.TempDir() + "/image_preview/" + cmhp_crypto.Sha1(args.Path) + ".webp"
+
+	// If file exists
+	if cmhp_file.Exists(tmpFile) {
+		f, err := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
+		if err != nil {
+			restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err.Error())
+		}
+		return f
+	}
+
+	// Generate preview
+	cmhp_process.Exec("magick", args.Path, "-quality", "32", "-define", "webp:lossless=false", "-thumbnail", "80x80^", "-gravity", "center", "-extent", "80x80", tmpFile)
 
 	f1, err1 := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
 	if err1 != nil {

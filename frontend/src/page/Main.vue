@@ -21,7 +21,7 @@
     </div>
 
     <!-- Preview -->
-    <div
+    <!--<div
       class="preview"
       v-for="(x, i) in list.filter(
         (x) => x.isSelected && x.name.match(/\.(png|jpeg|gif|jpg|mp4)$/),
@@ -40,7 +40,7 @@
         :src="$root.API_URL + `/file/videoThumbnail?path=${path}/${x.name}`"
         style="width: 100%"
       />
-    </div>
+    </div> -->
 
     <!-- Bottom -->
     <Bottom

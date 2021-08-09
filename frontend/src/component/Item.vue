@@ -1,6 +1,6 @@
 <template>
   <div @click="click()" class="item clickable" :class="isOdd ? 'odd' : ''">
-    <img :src="icon(item)" alt="File" />
+    <img class="icon" :src="icon(item)" alt="File" />
     <div class="name">{{ item.name }}</div>
     <div v-if="!item.isSelected" class="user">{{ item.user }}</div>
     <div v-if="!item.isSelected" class="size">{{ $root.pretty(item.size) }}</div>
@@ -44,8 +44,20 @@ export default defineComponent({
   async mounted() {},
   methods: {
     icon(file: any) {
-      // @ts-ignore
-      if (file.kind === 'file') return require('../asset/file/file.svg');
+      if (file.kind === 'file') {
+        if (file.name.match(/\.(png|jpeg|gif|jpg)$/)) {
+          return `${(this.$root as any).API_URL}/file/imageThumbnail?path=${this.path}/${
+            file.name
+          }`;
+        }
+        if (file.name.match(/\.(mp4|avi)$/)) {
+          return `${(this.$root as any).API_URL}/file/videoThumbnail?path=${this.path}/${
+            file.name
+          }`;
+        }
+        // @ts-ignore
+        return require('../asset/file/file.svg');
+      }
       // @ts-ignore
       return require('../asset/file/folder.svg');
     },
@@ -112,6 +124,10 @@ export default defineComponent({
   padding: 10px;
   color: #ababab;
   font-size: 14px;
+
+  .icon {
+    width: 80px;
+  }
 
   img {
     display: block;
