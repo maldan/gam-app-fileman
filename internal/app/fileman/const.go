@@ -10,6 +10,11 @@ type File struct {
 	Created time.Time `json:"created"`
 }
 
+type ArgsFileInfo struct {
+	Path string `json:"path"`
+	Data string `json:"data"`
+}
+
 type CreateFile struct {
 	Path  string `json:"path"`
 	Files [][]byte

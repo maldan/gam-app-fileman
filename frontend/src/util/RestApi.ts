@@ -71,5 +71,19 @@ export const RestApi = {
         })
       ).data.response;
     },
+
+    async saveInfo(path: string, data: any) {
+      return (await Axios.post(`${API_URL}/file/info`, { path, data: JSON.stringify(data) })).data
+        .response;
+    },
+
+    async getInfo(path: string) {
+      try {
+        const d = (await Axios.get(`${API_URL}/file/info?path=${path}`)).data.response;
+        return JSON.parse(d);
+      } catch {
+        return {};
+      }
+    },
   },
 };

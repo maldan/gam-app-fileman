@@ -19,8 +19,6 @@ import (
 type FileApi struct {
 }
 
-// var CurrentPath = "/mnt/g/Maldan/Docs/manga/bulma_and_goku_eng"
-
 var CurrentPath = "/"
 
 func (r FileApi) GetPath() string {
@@ -216,4 +214,21 @@ func (r FileApi) PostCopy(args ArgsRename) {
 // Copy file
 func (r FileApi) PostMove(args ArgsRename) {
 	cmhp_process.Exec("mv", "-T", args.From, args.To)
+}
+
+// Save file info
+func (r FileApi) PostInfo(args ArgsFileInfo) {
+	fileHash := GetFileHash(args.Path)
+	os.MkdirAll(DataDir+"/file_info", 0777)
+	cmhp_file.WriteText(DataDir+"/file_info/"+fileHash+".json", args.Data)
+}
+
+// Get file info
+func (r FileApi) GetInfo(args Path) string {
+	fileHash := GetFileHash(args.Path)
+	data, err := cmhp_file.ReadText(DataDir + "/file_info/" + fileHash + ".json")
+	if err != nil {
+		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", "Can't get file hash")
+	}
+	return data
 }

@@ -3,6 +3,7 @@
     <!-- Video -->
     <video
       @click="changeState"
+      v-doubleclick="changeOffset"
       ref="video"
       :src="`${$root.API_URL}/file/file?path=${path + '/' + list[currentId].name}`"
     ></video>
@@ -17,15 +18,45 @@
       <div class="current">{{ current }}</div>
       <div class="duration">{{ duration }}</div>
       <div class="fill" :style="{ width: progress * 100 + '%' }"></div>
+      <div
+        v-if="loopStart && loopEnd"
+        class="loop_fill"
+        :style="{
+          left: (loopStart / $refs['video'].duration) * 100 + '%',
+          width: ((loopEnd - loopStart) / $refs['video'].duration) * 100 + '%',
+        }"
+      ></div>
+
+      <div
+        v-for="x in bookmark"
+        class="bookmark"
+        :key="x[0]"
+        :style="{
+          left: (x[0] / $refs['video'].duration) * 100 + '%',
+          width: ((x[1] - x[0]) / $refs['video'].duration) * 100 + '%',
+        }"
+      ></div>
     </div>
 
     <!-- Control -->
     <div v-if="$refs['video']" class="control">
       <button class="clickable" @click="offset(-$refs['video'].playbackRate)">&lt;</button>
       <button class="clickable" @click="offset($refs['video'].playbackRate)">&gt;</button>
+
       <button class="clickable" @click="changeSpeed(-0.1)">Slow</button>
-      <div>{{ $refs['video'].playbackRate.toFixed(1) }}</div>
+      <div style="width: 50px; text-align: center">
+        {{ $refs['video'].playbackRate.toFixed(1) }}
+      </div>
       <button class="clickable" @click="changeSpeed(0.1)">Fast</button>
+      <button class="clickable" @click="loopStart = $refs['video'].currentTime">Loop Start</button>
+      <button class="clickable" @click="loopEnd = $refs['video'].currentTime">Loop End</button>
+      <button class="clickable" @click="(loopStart = 0), (loopEnd = 0)">Loop Clear</button>
+      <button
+        class="clickable"
+        @click="bookmark.push([loopStart, loopEnd]), (loopStart = 0), (loopEnd = 0), saveInfo()"
+      >
+        Save Loop
+      </button>
     </div>
   </div>
 </template>
@@ -34,6 +65,7 @@
 import { defineComponent } from 'vue';
 import IconButton from '../IconButton.vue';
 import Moment from 'moment';
+import { RestApi } from '../../util/RestApi';
 
 export default defineComponent({
   props: {
@@ -64,6 +96,23 @@ export default defineComponent({
     }, 16);
 
     document.addEventListener('keydown', this.keyEvents);
+    (this.$refs['video'] as HTMLVideoElement).addEventListener('timeupdate', () => {
+      if (this.loopStart && this.loopEnd) {
+        if ((this.$refs['video'] as HTMLVideoElement).currentTime >= this.loopEnd) {
+          (this.$refs['video'] as HTMLVideoElement).currentTime = this.loopStart;
+        }
+      }
+    });
+
+    // Get file info
+    try {
+      this.info = await RestApi.file.getInfo(this.file + '');
+      this.bookmark = this.info.bookmark || [];
+      console.log(this.info);
+    } catch (e) {}
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.keyEvents);
   },
   methods: {
     prev() {
@@ -76,6 +125,13 @@ export default defineComponent({
       this.currentId += 1;
       if (this.currentId > (this.list as any[]).length - 1) {
         this.currentId = (this.list as any[]).length - 1;
+      }
+    },
+    changeOffset(x: number) {
+      if (x < 0.5) {
+        this.offset(-(this.$refs['video'] as any).playbackRate * 5);
+      } else {
+        this.offset((this.$refs['video'] as any).playbackRate * 5);
       }
     },
 
@@ -125,6 +181,11 @@ export default defineComponent({
       const video = this.$refs['video'] as HTMLVideoElement;
       video.playbackRate += speed;
     },
+    async saveInfo() {
+      await RestApi.file.saveInfo(this.file + '', {
+        bookmark: this.bookmark,
+      });
+    },
   },
   data: () => {
     return {
@@ -134,6 +195,12 @@ export default defineComponent({
       progress: 0,
       current: '',
       duration: '',
+
+      loopStart: 0,
+      loopEnd: 0,
+      bookmark: [],
+
+      info: {} as any,
     };
   },
 });
@@ -166,7 +233,7 @@ export default defineComponent({
 
   video {
     width: 100%;
-    height: calc(100% - 50px);
+    height: calc(100% - 72px);
   }
 
   .control {
@@ -178,7 +245,7 @@ export default defineComponent({
       background: #2c72e2;
       color: #fefefe;
       border: 0;
-      padding: 5px 10px;
+      padding: 10px 20px;
     }
   }
 
@@ -187,15 +254,30 @@ export default defineComponent({
     position: relative;
     bottom: 0px;
     width: 100%;
-    font-size: 12px;
-    height: 16px;
+    font-size: 17px;
+    height: 24px;
     box-sizing: border-box;
     color: #d4d4d4;
     // border-top: 1px solid #19191985;
 
-    .fill {
-      width: 50%;
+    .fill,
+    .loop_fill {
+      width: 0%;
       background: #b4b4b45e;
+    }
+    .loop_fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 50%;
+      background: #03c513ce;
+    }
+    .bookmark {
+      position: absolute;
+      left: 0;
+      top: 19px;
+      height: 25%;
+      background: #e0ad03e8;
     }
 
     .duration,
