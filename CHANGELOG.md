@@ -1,3 +1,8 @@
+## [0.0.10] - 2021-07-21
+
+### Fixed
+-    Download from xvideos
+
 ## [0.0.9] - 2021-07-15
 
 ### Fixed
