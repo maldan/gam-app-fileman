@@ -59,6 +59,7 @@
       @copy="(bufferPath = path), (copyMode = 'copy'), (buffer = list.filter((x) => x.isSelected))"
       @cut="(bufferPath = path), (copyMode = 'cut'), (buffer = list.filter((x) => x.isSelected))"
       @tab="selectTab($event)"
+      @open="view = $event"
     />
 
     <!-- Views -->
@@ -84,9 +85,10 @@ import Header from '../component/Header.vue';
 import Bottom from '../component/Bottom.vue';
 import ViewImage from '../component/view/Image.vue';
 import ViewVideo from '../component/view/Video.vue';
+import ViewDownload from '../component/view/Download.vue';
 
 export default defineComponent({
-  components: { IconButton, Path, Item, Header, Bottom, ViewImage, ViewVideo },
+  components: { IconButton, Path, Item, Header, Bottom, ViewImage, ViewVideo, ViewDownload },
   async mounted() {
     this.selectTab(0);
     this.path = await RestApi.file.getPath();

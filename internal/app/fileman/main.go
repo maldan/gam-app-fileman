@@ -9,13 +9,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/maldan/gam-app-fileman/internal/app/fileman/api"
+	"github.com/maldan/gam-app-fileman/internal/app/fileman/core"
 	"github.com/maldan/go-restserver"
 	"github.com/zserge/lorca"
 )
-
-var DataDir = ""
-var Host = ""
-var Folder = ""
 
 func Start(frontFs embed.FS) {
 	var host = flag.String("host", "127.0.0.1", "Server Hostname")
@@ -29,9 +27,9 @@ func Start(frontFs embed.FS) {
 	var folder = flag.String("folder", "", "Folder")
 	_ = flag.String("appId", "id", "App id")
 	flag.Parse()
-	DataDir = *dataDir
-	Host = *host
-	Folder = *folder
+	core.DataDir = *dataDir
+	core.Host = *host
+	core.Folder = *folder
 
 	// Copy as dev app
 	if *initDev {
@@ -62,7 +60,8 @@ func Start(frontFs embed.FS) {
 	restserver.Start(fmt.Sprintf("%s:%d", *host, *port), map[string]interface{}{
 		"/": restserver.VirtualFs{Root: "frontend/build/", Fs: frontFs},
 		"/api": map[string]interface{}{
-			"file": FileApi{},
+			"file":     api.FileApi{},
+			"download": api.DownloadApi{},
 		},
 	})
 }

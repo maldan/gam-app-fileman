@@ -21,6 +21,7 @@
       >
         {{ i + 1 }}
       </div>
+      <div class="tab clickable" @click="$emit('open', 'download')">Download</div>
     </div>
 
     <!-- Sort mode -->
@@ -44,7 +45,7 @@
     <div @click="du()" class="selected_files clickable">DU</div>
 
     <!-- Sort mode -->
-    <div @click="changeSortBy()" class="selected_files clickable">by {{ sort }}</div>
+    <div @click="changeSortBy()" class="selected_files clickable">By {{ sort }}</div>
 
     <div
       @click="unselect()"

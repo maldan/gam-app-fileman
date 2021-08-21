@@ -1,4 +1,4 @@
-package fileman
+package core
 
 import "time"
 
@@ -10,9 +10,13 @@ type File struct {
 	Created time.Time `json:"created"`
 }
 
-type ArgsFileInfo struct {
-	Path string `json:"path"`
-	Data string `json:"data"`
+type Download struct {
+	Url       string    `json:"url"`
+	Path      string    `json:"path"`
+	Name      string    `json:"name"`
+	Progress  float64   `json:"progress"`
+	TotalSize int64     `json:"totalSize"`
+	Created   time.Time `json:"created"`
 }
 
 type CreateFile struct {
@@ -24,7 +28,6 @@ type Path struct {
 	Path string `json:"path"`
 }
 
-type ArgsRename struct {
-	From string `json:"from"`
-	To   string `json:"to"`
-}
+var DataDir = ""
+var Host = ""
+var Folder = ""

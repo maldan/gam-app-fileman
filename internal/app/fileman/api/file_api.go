@@ -1,4 +1,4 @@
-package fileman
+package api
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/maldan/gam-app-fileman/internal/app/fileman/core"
 	"github.com/maldan/go-cmhp/cmhp_crypto"
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_process"
@@ -25,12 +26,12 @@ func (r FileApi) GetPath() string {
 	return CurrentPath
 }
 
-func (r FileApi) PostPath(args Path) {
+func (r FileApi) PostPath(args core.Path) {
 	CurrentPath = args.Path
 }
 
 // Get video thumbnail
-func (f FileApi) GetVideoThumbnail(args Path) *os.File {
+func (f FileApi) GetVideoThumbnail(args core.Path) *os.File {
 	// Temp file
 	os.MkdirAll(os.TempDir()+"/video_preview/", 0777)
 	tmpFile := os.TempDir() + "/video_preview/" + cmhp_crypto.Sha1(args.Path) + ".webp"
@@ -58,7 +59,7 @@ func (f FileApi) GetVideoThumbnail(args Path) *os.File {
 }
 
 // Get image thumbnail
-func (f FileApi) GetImageThumbnail(args Path) *os.File {
+func (f FileApi) GetImageThumbnail(args core.Path) *os.File {
 	// Temp file
 	os.MkdirAll(os.TempDir()+"/image_preview/", 0777)
 	tmpFile := os.TempDir() + "/image_preview/" + cmhp_crypto.Sha1(args.Path) + ".webp"
@@ -83,7 +84,7 @@ func (f FileApi) GetImageThumbnail(args Path) *os.File {
 }
 
 // Get file content
-func (f FileApi) GetFile(args Path) *os.File {
+func (f FileApi) GetFile(args core.Path) *os.File {
 	file, err := os.OpenFile(args.Path, os.O_RDONLY, 0777)
 	if err != nil {
 		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err.Error())
@@ -92,16 +93,16 @@ func (f FileApi) GetFile(args Path) *os.File {
 }
 
 // Get file content
-func (f FileApi) GetDirSize(args Path) int64 {
+func (f FileApi) GetDirSize(args core.Path) int64 {
 	out := cmhp_process.Exec("du", "-d", "0", "-b", args.Path)
 	i, _ := strconv.ParseInt(strings.Split(out, "\t")[0], 10, 64)
 	return i
 }
 
 // Get list
-func (r FileApi) GetList(args Path) []File {
+func (r FileApi) GetList(args core.Path) []core.File {
 	files, _ := cmhp_file.List(args.Path)
-	out := make([]File, 0)
+	out := make([]core.File, 0)
 	for _, file := range files {
 		kind := "file"
 		if file.IsDir() {
@@ -112,7 +113,7 @@ func (r FileApi) GetList(args Path) []File {
 		}
 
 		// Create file
-		outFile := File{
+		outFile := core.File{
 			Name:    file.Name(),
 			User:    "",
 			Kind:    kind,
@@ -137,7 +138,7 @@ func (r FileApi) GetList(args Path) []File {
 }
 
 // Open file
-func (f FileApi) PostOpen(args Path) {
+func (f FileApi) PostOpen(args core.Path) {
 	appName := ""
 
 	// If image
@@ -162,14 +163,14 @@ func (f FileApi) PostOpen(args Path) {
 		"gam",
 		"run",
 		appName,
-		fmt.Sprintf("--host=%v", Host),
+		fmt.Sprintf("--host=%v", core.Host),
 		fmt.Sprintf("--file=%v", args.Path),
 		fmt.Sprintf("--folder=%v", filepath.Dir(args.Path)),
 	)
 }
 
 // Add new file
-func (r FileApi) PostFile(args CreateFile) {
+func (r FileApi) PostFile(args core.CreateFile) {
 	if len(args.Files) > 0 {
 		cmhp_file.WriteBin(args.Path, args.Files[0])
 	} else {
@@ -186,17 +187,17 @@ func (r FileApi) PostRename(args ArgsRename) {
 }
 
 // Add new dir
-func (r FileApi) PostDir(args CreateFile) {
+func (r FileApi) PostDir(args core.CreateFile) {
 	os.MkdirAll(args.Path, 0777)
 }
 
 // Delete file
-func (r FileApi) DeleteFile(args CreateFile) {
+func (r FileApi) DeleteFile(args core.CreateFile) {
 	cmhp_file.Delete(args.Path)
 }
 
 // Delete dir
-func (r FileApi) DeleteDir(args CreateFile) {
+func (r FileApi) DeleteDir(args core.CreateFile) {
 	if cmhp_slice.Includes([]interface{}{
 		"/", "/home", "/root", "/var", "/www", "/etc", "/bin", "/boot", "/mnt", "/media",
 		"/var", "/usr", "/tmp",
@@ -218,15 +219,15 @@ func (r FileApi) PostMove(args ArgsRename) {
 
 // Save file info
 func (r FileApi) PostInfo(args ArgsFileInfo) {
-	fileHash := GetFileHash(args.Path)
-	os.MkdirAll(DataDir+"/file_info", 0777)
-	cmhp_file.WriteText(DataDir+"/file_info/"+fileHash+".json", args.Data)
+	fileHash := core.GetFileHash(args.Path)
+	os.MkdirAll(core.DataDir+"/file_info", 0777)
+	cmhp_file.WriteText(core.DataDir+"/file_info/"+fileHash+".json", args.Data)
 }
 
 // Get file info
-func (r FileApi) GetInfo(args Path) string {
-	fileHash := GetFileHash(args.Path)
-	data, err := cmhp_file.ReadText(DataDir + "/file_info/" + fileHash + ".json")
+func (r FileApi) GetInfo(args core.Path) string {
+	fileHash := core.GetFileHash(args.Path)
+	data, err := cmhp_file.ReadText(core.DataDir + "/file_info/" + fileHash + ".json")
 	if err != nil {
 		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", "Can't get file hash")
 	}

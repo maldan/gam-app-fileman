@@ -86,4 +86,17 @@ export const RestApi = {
       }
     },
   },
+  download: {
+    async getList() {
+      return (await Axios.get(`${API_URL}/download/list`)).data.response;
+    },
+    async add(url: string, path: string) {
+      return (
+        await Axios.post(`${API_URL}/download`, {
+          url,
+          path,
+        })
+      ).data.response;
+    },
+  },
 };

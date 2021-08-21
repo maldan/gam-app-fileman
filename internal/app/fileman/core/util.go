@@ -1,4 +1,4 @@
-package fileman
+package core
 
 import (
 	"os"
