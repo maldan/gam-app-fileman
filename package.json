@@ -1,6 +1,6 @@
 {
   "name": "@maldan/gam-app-fileman",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "File Manager",
   "main": "index.js",
   "scripts": {},
