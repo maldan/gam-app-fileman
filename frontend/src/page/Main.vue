@@ -66,10 +66,11 @@
     <component
       v-if="view"
       :is="`view-${view}`"
-      @close="view = ''"
+      @close="(view = ''), refresh()"
       :list="list"
       :path="path"
       :file="selectedFile"
+      :data="[pasteData.image, pasteData.imageFile]"
     />
   </div>
 </template>
@@ -86,14 +87,43 @@ import Bottom from '../component/Bottom.vue';
 import ViewImage from '../component/view/Image.vue';
 import ViewVideo from '../component/view/Video.vue';
 import ViewDownload from '../component/view/Download.vue';
+import ViewPaste from '../component/view/Paste.vue';
 
 export default defineComponent({
-  components: { IconButton, Path, Item, Header, Bottom, ViewImage, ViewVideo, ViewDownload },
+  components: {
+    IconButton,
+    Path,
+    Item,
+    Header,
+    Bottom,
+    ViewImage,
+    ViewVideo,
+    ViewDownload,
+    ViewPaste,
+  },
   async mounted() {
     this.selectTab(0);
     this.path = await RestApi.file.getPath();
-
     this.refresh();
+
+    // Paste image
+    document.onpaste = (event) => {
+      var items = event.clipboardData?.items || [];
+      for (const index in items) {
+        var item = items[index];
+        if (item.kind === 'file') {
+          var blob = item.getAsFile();
+          var reader = new FileReader();
+          reader.onload = (event) => {
+            // @ts-ignore
+            this.pasteData.image = event.target?.result || '';
+            this.view = 'paste';
+          };
+          this.pasteData.imageFile = blob as File;
+          reader.readAsDataURL(blob as any);
+        }
+      }
+    };
   },
   watch: {
     async path() {
@@ -199,6 +229,11 @@ export default defineComponent({
       buffer: [] as any[],
       tab: null as any,
       tabs: [{ path: '/' }, { path: '/' }, { path: '/' }],
+
+      pasteData: {
+        image: null as any,
+        imageFile: null as any,
+      },
     };
   },
 });

@@ -47,12 +47,8 @@
     <!-- Sort mode -->
     <div @click="changeSortBy()" class="selected_files clickable">By {{ sort }}</div>
 
-    <div
-      @click="unselect()"
-      class="selected_files clickable"
-      v-if="list.filter((x) => x.isSelected).length"
-    >
-      {{ list.filter((x) => x.isSelected).length }} / {{ buffer.length }}
+    <div @click="unselect()" class="selected_files clickable">
+      {{ list.filter((x) => x.isSelected).length }} / {{ list.length }}
     </div>
 
     <IconButton @click="selectFiles()" icon="upload" style="margin-right: 15px" />
