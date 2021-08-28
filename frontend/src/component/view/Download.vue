@@ -1,6 +1,6 @@
 <template>
   <div class="view_download">
-    <IconButton class="close" icon="close" @click="$emit('close')" />
+    <IconButton class="close" icon="close" @click="$emit('close'), $emit('refresh')" />
 
     <div class="window">
       <div class="top">

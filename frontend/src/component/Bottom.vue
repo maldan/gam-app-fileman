@@ -24,6 +24,10 @@
       <div class="tab clickable" @click="$emit('open', 'download')">Download</div>
     </div>
 
+    <div @click="$emit('changeView', !isList)" class="selected_files clickable">
+      {{ isList ? 'List' : 'Block' }}
+    </div>
+
     <!-- Sort mode -->
     <div
       v-if="list.filter((x) => x.isSelected).length"
@@ -71,6 +75,7 @@ export default defineComponent({
     buffer: Array,
     tabs: Array,
     tab: Object,
+    isList: Boolean,
   },
   components: { IconButton },
   async mounted() {},

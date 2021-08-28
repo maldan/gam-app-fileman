@@ -1,28 +1,28 @@
 <template>
   <div @click="click()" class="item clickable" :class="isOdd ? 'odd' : ''">
-    <img class="icon" :src="icon(item)" alt="File" />
-    <div class="name">{{ item.name }}</div>
-    <div v-if="!item.isSelected" class="user">{{ item.user }}</div>
-    <div v-if="!item.isSelected" class="size">{{ $root.pretty(item.size) }}</div>
-    <div v-if="!item.isSelected" class="created">
+    <img :class="isList ? 'icon' : 'icon_big'" :src="icon(item)" alt="File" />
+    <div v-if="isList" class="name">{{ item.name }}</div>
+    <div v-if="isList && !item.isSelected" class="user">{{ item.user }}</div>
+    <div v-if="isList && !item.isSelected" class="size">{{ $root.pretty(item.size) }}</div>
+    <div v-if="isList && !item.isSelected" class="created">
       {{ $root.moment(item.created).format('YYYY-MM-DD HH:mm:ss') }}
     </div>
 
     <IconButton
       @click.stop="download()"
-      v-if="item.isSelected"
+      v-if="isList && item.isSelected"
       icon="download"
       style="margin-left: auto"
     />
     <IconButton
       @click.stop="rename()"
-      v-if="item.isSelected"
+      v-if="isList && item.isSelected"
       icon="pencil"
       style="margin-left: 15px"
     />
     <IconButton
       @click.stop="remove()"
-      v-if="item.isSelected"
+      v-if="isList && item.isSelected"
       icon="delete"
       style="margin-left: 15px"
     />
@@ -39,6 +39,7 @@ export default defineComponent({
     item: Object,
     isOdd: Boolean,
     path: String,
+    isList: Boolean,
   },
   components: { IconButton },
   async mounted() {},
@@ -127,6 +128,10 @@ export default defineComponent({
 
   .icon {
     width: 80px;
+  }
+
+  .icon_big {
+    width: 100%;
   }
 
   img {

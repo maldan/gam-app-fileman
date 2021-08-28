@@ -7,13 +7,14 @@
     <div v-show="isLoading" class="body"></div>
 
     <!-- File list -->
-    <div v-show="!isLoading" class="body">
+    <div v-show="!isLoading" :class="isList ? 'body' : 'body_grid'">
       <Item
         v-for="(x, i) in list"
         :key="x.name"
         :item="x"
         :isOdd="i % 2 === 1"
         :path="path"
+        :isList="isList"
         @update="path = fixPath($event)"
         @refresh="refresh()"
         @open="openFile"
@@ -51,6 +52,8 @@
       :buffer="buffer"
       :tab="tab"
       :tabs="tabs"
+      :isList="isList"
+      @changeView="isList = $event"
       @changeSort="sortBy = $event"
       @update="path = fixPath($event)"
       @refresh="refresh()"
@@ -66,7 +69,8 @@
     <component
       v-if="view"
       :is="`view-${view}`"
-      @close="(view = ''), refresh()"
+      @refresh="refresh()"
+      @close="view = ''"
       :list="list"
       :path="path"
       :file="selectedFile"
@@ -229,6 +233,7 @@ export default defineComponent({
       buffer: [] as any[],
       tab: null as any,
       tabs: [{ path: '/' }, { path: '/' }, { path: '/' }],
+      isList: true,
 
       pasteData: {
         image: null as any,
@@ -252,6 +257,15 @@ export default defineComponent({
     position: relative;
   }
 
+  .body_grid {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    height: calc(100% - 45px - 40px);
+    overflow-y: auto;
+    position: relative;
+    grid-auto-rows: max-content;
+  }
+
   .preview {
     position: fixed;
     bottom: 50px;
@@ -264,4 +278,22 @@ export default defineComponent({
     overflow: hidden;
   }
 }
+
+@for $i from 0 through 11 {
+  @media (max-width: (2550px-$i*140px)) {
+    .main {
+      .body_grid {
+        grid-template-columns: repeat(13-$i, 1fr);
+      }
+    }
+  }
+}
+
+/*@media (max-width: 1990px) {
+  .main {
+    .body_grid {
+      grid-template-columns: repeat(10, 1fr);
+    }
+  }
+}*/
 </style>

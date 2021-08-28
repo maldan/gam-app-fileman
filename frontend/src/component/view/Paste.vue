@@ -1,6 +1,6 @@
 <template>
   <div class="view_paste">
-    <IconButton class="close" icon="close" @click="$emit('close')" />
+    <IconButton class="close" icon="close" @click="$emit('close'), $emit('refresh')" />
 
     <div class="window">
       <img :src="data[0]" alt="" style="max-height: 640px" />
