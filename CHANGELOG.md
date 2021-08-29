@@ -1,3 +1,13 @@
+## [0.0.13] - 2021-07-29
+
+### Fixed
+-    Webp preview
+-    Download new design
+-    Config for app
+-    Big size for preview
+-    Simplyentai download support
+-    Minor fix
+
 ## [0.0.12] - 2021-07-28
 
 ### Fixed
