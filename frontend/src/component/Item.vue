@@ -46,7 +46,7 @@ export default defineComponent({
   methods: {
     icon(file: any) {
       if (file.kind === 'file') {
-        if (file.name.match(/\.(png|jpeg|gif|jpg)$/)) {
+        if (file.name.match(/\.(png|jpeg|gif|jpg|webp)$/)) {
           return `${(this.$root as any).API_URL}/file/imageThumbnail?path=${this.path}/${
             file.name
           }`;

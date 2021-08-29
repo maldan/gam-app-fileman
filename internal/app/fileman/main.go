@@ -11,6 +11,7 @@ import (
 
 	"github.com/maldan/gam-app-fileman/internal/app/fileman/api"
 	"github.com/maldan/gam-app-fileman/internal/app/fileman/core"
+	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-restserver"
 	"github.com/zserge/lorca"
 )
@@ -30,6 +31,9 @@ func Start(frontFs embed.FS) {
 	core.DataDir = *dataDir
 	core.Host = *host
 	core.Folder = *folder
+
+	// Read config
+	cmhp_file.ReadJSON(core.DataDir+"/config.json", &core.AppConfig)
 
 	// Copy as dev app
 	if *initDev {

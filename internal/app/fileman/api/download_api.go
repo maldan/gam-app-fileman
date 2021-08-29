@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
 	"github.com/maldan/gam-app-fileman/internal/app/fileman/core"
+	"github.com/maldan/gam-app-fileman/internal/app/fileman/plugin"
 	"github.com/maldan/go-cmhp/cmhp_crypto"
 	"github.com/maldan/go-cmhp/cmhp_net"
 	"github.com/maldan/go-restserver"
@@ -33,19 +35,30 @@ var DownloadList = make([]*core.Download, 0)
 
 // Download list
 func (r DownloadApi) GetList() []*core.Download {
-	return DownloadList
+	dl := DownloadList
+	sort.SliceStable(dl, func(i, j int) bool {
+		return dl[i].Created.Unix() > dl[j].Created.Unix()
+	})
+	return dl
 }
 
 // Download
 func (r DownloadApi) PostIndex(args core.Download) {
-	if !strings.Contains(args.Url, "xvideos.com") {
-		restserver.Fatal(500, restserver.ErrorType.Unknown, "url", "Url not supported")
-	}
-
 	args.Created = time.Now()
 	args.Name = cmhp_crypto.UID(16)
 	DownloadList = append(DownloadList, &args)
-	go DownloadFromXvideos(&args)
+
+	if strings.Contains(args.Url, "xvideos.com") {
+		go DownloadFromXvideos(&args)
+		return
+	}
+
+	if strings.Contains(args.Url, "simply-hentai.com") {
+		go plugin.DownloadFromSimplyHentai(&args)
+		return
+	}
+
+	restserver.Fatal(500, restserver.ErrorType.Unknown, "url", "Url not supported")
 }
 
 func DownloadFromXvideos(args *core.Download) {
@@ -55,6 +68,7 @@ func DownloadFromXvideos(args *core.Download) {
 		Headers: map[string]string{
 			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36",
 		},
+		Proxy: core.AppConfig.Proxy,
 	})
 
 	// Find url

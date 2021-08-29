@@ -7,12 +7,20 @@
         <Input placeholder="Url" v-model="url" />
         <Button text="Add" @click="add()" />
       </div>
-      <div class="list">
-        <div class="item" v-for="x in list" :key="x">
-          <div>{{ x.url }}</div>
-          <div>{{ x.path }}{{ x.name }}</div>
-          <div>{{ ~~(x.progress * 100) }}%</div>
-          <div>{{ $root.moment(x.created).fromNow() }}</div>
+      <div class="list_container">
+        <div v-if="list.length > 0" class="list">
+          <div class="item" v-for="x in list" :key="x.name">
+            <div>{{ x.url }}</div>
+            <div>{{ x.path }}{{ x.name }}</div>
+            <div style="display: flex">
+              <div class="progress" style="flex: 1">
+                <div class="fill" :style="{ width: x.progress * 100 + '%' }">
+                  {{ ~~(x.progress * 100) }}%
+                </div>
+              </div>
+              <div>{{ $root.moment(x.created).format('HH:mm:ss') }}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -88,6 +96,7 @@ export default defineComponent({
     border-radius: 3px;
     display: flex;
     flex-direction: column;
+    width: 600px;
 
     .top {
       display: flex;
@@ -95,30 +104,56 @@ export default defineComponent({
 
       button {
         margin-left: 10px;
+        flex: none;
       }
     }
 
-    .list {
-      display: flex;
-      flex-direction: column;
-      margin-top: 10px;
+    .list_container {
+      max-height: 400px;
+      overflow-y: auto;
 
-      .item {
+      .list {
         display: flex;
-        background: #1b1b1b;
-        color: #999999;
-        margin-bottom: 10px;
+        flex-direction: column;
+        margin-top: 10px;
 
-        > div {
-          flex: 1;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          padding: 10px;
-        }
+        .item {
+          display: flex;
+          background: #1b1b1b;
+          color: #999999;
+          margin-bottom: 10px;
+          flex-direction: column;
 
-        &:last-child {
-          margin-bottom: 0;
+          > div {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 10px;
+          }
+
+          .progress {
+            border-radius: 3px;
+            margin-right: 10px;
+            background: #202020;
+            overflow: hidden;
+
+            .fill {
+              width: 0%;
+              height: 100%;
+              background: #4360a0;
+              transition: width 0.3s ease;
+              color: #cecece;
+              font-size: 14px;
+              display: flex;
+              align-items: center;
+              padding-left: 5px;
+            }
+          }
+
+          &:last-child {
+            margin-bottom: 0;
+          }
         }
       }
     }

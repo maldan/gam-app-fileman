@@ -49,7 +49,7 @@ func (f FileApi) GetVideoThumbnail(args core.Path) *os.File {
 	cmhp_process.Exec("ffmpeg",
 		"-i", args.Path, "-vf",
 		"select=eq(n\\,320)", "-frames:v", "1",
-		"-s", "160x160", tmpFile, "-y")
+		"-s", "256x256", tmpFile, "-y")
 
 	f1, err1 := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
 	if err1 != nil {
@@ -74,7 +74,7 @@ func (f FileApi) GetImageThumbnail(args core.Path) *os.File {
 	}
 
 	// Generate preview
-	cmhp_process.Exec("magick", args.Path, "-quality", "48", "-define", "webp:lossless=false", "-thumbnail", "160x160^", "-gravity", "center", "-extent", "160x160", tmpFile)
+	cmhp_process.Exec("magick", args.Path, "-quality", "80", "-define", "webp:lossless=false", "-thumbnail", "256x256^", "-gravity", "center", "-extent", "256x256", tmpFile)
 
 	f1, err1 := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
 	if err1 != nil {

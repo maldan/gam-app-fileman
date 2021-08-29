@@ -33,6 +33,7 @@ export default defineComponent({
         (e) => {
           // this.progress[i] = e.loaded / items[i].size;
           this.$emit('close');
+          this.$emit('refresh');
         },
       );
     },

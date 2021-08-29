@@ -28,6 +28,11 @@ type Path struct {
 	Path string `json:"path"`
 }
 
+type Config struct {
+	Proxy string `json:"proxy"`
+}
+
 var DataDir = ""
 var Host = ""
 var Folder = ""
+var AppConfig Config
