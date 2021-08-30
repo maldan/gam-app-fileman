@@ -99,4 +99,9 @@ export const RestApi = {
       ).data.response;
     },
   },
+  disk: {
+    async getUsage(): Promise<any> {
+      return (await Axios.get(`${API_URL}/disk/usage`)).data.response;
+    },
+  },
 };

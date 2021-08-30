@@ -22,6 +22,7 @@
         {{ i + 1 }}
       </div>
       <div class="tab clickable" @click="$emit('open', 'download')">Download</div>
+      <div class="tab clickable" @click="$emit('open', 'usage')">Usage</div>
     </div>
 
     <div @click="$emit('changeView', !isList)" class="selected_files clickable">

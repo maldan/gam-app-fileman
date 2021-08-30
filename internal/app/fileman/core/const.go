@@ -19,6 +19,13 @@ type Download struct {
 	Created   time.Time `json:"created"`
 }
 
+type Usage struct {
+	Used  int64  `json:"used"`
+	Total int64  `json:"total"`
+	Fs    string `json:"fs"`
+	Mount string `json:"mount"`
+}
+
 type CreateFile struct {
 	Path  string `json:"path"`
 	Files [][]byte

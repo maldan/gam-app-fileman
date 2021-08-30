@@ -92,6 +92,7 @@ import ViewImage from '../component/view/Image.vue';
 import ViewVideo from '../component/view/Video.vue';
 import ViewDownload from '../component/view/Download.vue';
 import ViewPaste from '../component/view/Paste.vue';
+import ViewUsage from '../component/view/Usage.vue';
 
 export default defineComponent({
   components: {
@@ -104,6 +105,7 @@ export default defineComponent({
     ViewVideo,
     ViewDownload,
     ViewPaste,
+    ViewUsage,
   },
   async mounted() {
     this.selectTab(0);

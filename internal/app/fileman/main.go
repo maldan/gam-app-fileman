@@ -66,6 +66,7 @@ func Start(frontFs embed.FS) {
 		"/api": map[string]interface{}{
 			"file":     api.FileApi{},
 			"download": api.DownloadApi{},
+			"disk":     api.DiskApi{},
 		},
 	})
 }
