@@ -4,7 +4,7 @@
 
     <div class="window">
       <div class="top">
-        <Input placeholder="Url" v-model="url" />
+        <TextArea placeholder="Url" v-model="url" />
         <Button text="Add" @click="add()" />
       </div>
       <div class="list_container">
@@ -31,6 +31,7 @@
 import { defineComponent } from 'vue';
 import IconButton from '../IconButton.vue';
 import Input from '../Input.vue';
+import TextArea from '../TextArea.vue';
 import Button from '../Button.vue';
 import { RestApi } from '../../util/RestApi';
 
@@ -39,7 +40,7 @@ export default defineComponent({
     path: String,
     file: String,
   },
-  components: { IconButton, Input, Button },
+  components: { IconButton, Input, Button, TextArea },
   async mounted() {
     await this.refresh();
 
@@ -52,7 +53,11 @@ export default defineComponent({
   },
   methods: {
     async add() {
-      await RestApi.download.add(this.url, (this.path + '/').replace(/\/\//g, '/'));
+      const list = this.url.split(' ');
+      for (let i = 0; i < list.length; i++) {
+        await RestApi.download.add(list[i], (this.path + '/').replace(/\/\//g, '/'));
+      }
+
       this.url = '';
       await this.refresh();
     },

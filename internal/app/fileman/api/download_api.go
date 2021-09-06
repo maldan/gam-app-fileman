@@ -24,6 +24,8 @@ type WriteCounter struct {
 	Download *core.Download
 }
 
+var semaphoreChan = make(chan int, 3)
+
 func (wc *WriteCounter) Write(p []byte) (int, error) {
 	n := len(p)
 	wc.Total += uint64(n)
@@ -49,19 +51,29 @@ func (r DownloadApi) PostIndex(args core.Download) {
 	DownloadList = append(DownloadList, &args)
 
 	if strings.Contains(args.Url, "xvideos.com") {
-		go DownloadFromXvideos(&args)
+		go DownloadFromXvideos(&args, semaphoreChan)
 		return
 	}
 
 	if strings.Contains(args.Url, "simply-hentai.com") {
-		go plugin.DownloadFromSimplyHentai(&args)
+		go plugin.DownloadFromSimplyHentai(&args, semaphoreChan)
+		return
+	}
+
+	if strings.Contains(args.Url, "userapi.com") {
+		go plugin.DownloadFromVK(&args, semaphoreChan)
 		return
 	}
 
 	restserver.Fatal(500, restserver.ErrorType.Unknown, "url", "Url not supported")
 }
 
-func DownloadFromXvideos(args *core.Download) {
+func DownloadFromXvideos(args *core.Download, ch chan int) {
+	ch <- 1
+	defer func() {
+		<-ch
+	}()
+
 	x := cmhp_net.Request(cmhp_net.HttpArgs{
 		Url:    args.Url,
 		Method: "GET",

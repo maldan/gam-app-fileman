@@ -24,6 +24,7 @@
             :src="$root.API_URL + `/file/file?path=${path + '/' + x.name}`"
             :style="isWidth ? { width: '100%' } : { height: '100%' }"
             draggable="false"
+            loading="lazy"
           />
         </div>
       </div>

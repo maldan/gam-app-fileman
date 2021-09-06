@@ -28,7 +28,12 @@ type SimplyHentai struct {
 	Data SimplyHentaiData `json:"data"`
 }
 
-func DownloadFromSimplyHentai(args *core.Download) {
+func DownloadFromSimplyHentai(args *core.Download, ch chan int) {
+	ch <- 1
+	defer func() {
+		<-ch
+	}()
+
 	// Find url
 	r, _ := regexp.Compile(`simply-hentai\.com\/(.*?)\/page`)
 	xx := r.FindStringSubmatch(string(args.Url))

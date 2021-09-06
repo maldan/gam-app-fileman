@@ -1,6 +1,6 @@
 <template>
   <div @click="click()" class="item clickable" :class="isOdd ? 'odd' : ''">
-    <img :class="isList ? 'icon' : 'icon_big'" :src="icon(item)" alt="File" />
+    <img :class="isList ? 'icon' : 'icon_big'" :src="icon(item)" alt="File" loading="lazy" />
     <div v-if="isList" class="name">{{ item.name }}</div>
     <div v-if="isList && !item.isSelected" class="user">{{ item.user }}</div>
     <div v-if="isList && !item.isSelected" class="size">{{ $root.pretty(item.size) }}</div>
