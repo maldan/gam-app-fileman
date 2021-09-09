@@ -1,2 +1,5 @@
 /application*.zip
 /app*
+/config.json
+/db
+/.history

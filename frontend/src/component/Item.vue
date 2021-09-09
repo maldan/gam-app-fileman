@@ -1,28 +1,28 @@
 <template>
   <div @click="click()" class="item clickable" :class="isOdd ? 'odd' : ''">
-    <img :src="icon(item)" alt="File" />
-    <div class="name">{{ item.name }}</div>
-    <div v-if="!item.isSelected" class="user">{{ item.user }}</div>
-    <div v-if="!item.isSelected" class="size">{{ $root.pretty(item.size) }}</div>
-    <div v-if="!item.isSelected" class="created">
+    <img :class="isList ? 'icon' : 'icon_big'" :src="icon(item)" alt="File" loading="lazy" />
+    <div v-if="isList" class="name">{{ item.name }}</div>
+    <div v-if="isList && !item.isSelected" class="user">{{ item.user }}</div>
+    <div v-if="isList && !item.isSelected" class="size">{{ $root.pretty(item.size) }}</div>
+    <div v-if="isList && !item.isSelected" class="created">
       {{ $root.moment(item.created).format('YYYY-MM-DD HH:mm:ss') }}
     </div>
 
     <IconButton
       @click.stop="download()"
-      v-if="item.isSelected"
+      v-if="isList && item.isSelected"
       icon="download"
       style="margin-left: auto"
     />
     <IconButton
       @click.stop="rename()"
-      v-if="item.isSelected"
+      v-if="isList && item.isSelected"
       icon="pencil"
       style="margin-left: 15px"
     />
     <IconButton
       @click.stop="remove()"
-      v-if="item.isSelected"
+      v-if="isList && item.isSelected"
       icon="delete"
       style="margin-left: 15px"
     />
@@ -39,13 +39,26 @@ export default defineComponent({
     item: Object,
     isOdd: Boolean,
     path: String,
+    isList: Boolean,
   },
   components: { IconButton },
   async mounted() {},
   methods: {
     icon(file: any) {
-      // @ts-ignore
-      if (file.kind === 'file') return require('../asset/file/file.svg');
+      if (file.kind === 'file') {
+        if (file.name.match(/\.(png|jpeg|gif|jpg|webp)$/)) {
+          return `${(this.$root as any).API_URL}/file/imageThumbnail?path=${this.path}/${
+            file.name
+          }`;
+        }
+        if (file.name.match(/\.(mp4|avi)$/)) {
+          return `${(this.$root as any).API_URL}/file/videoThumbnail?path=${this.path}/${
+            file.name
+          }`;
+        }
+        // @ts-ignore
+        return require('../asset/file/file.svg');
+      }
       // @ts-ignore
       return require('../asset/file/folder.svg');
     },
@@ -91,6 +104,8 @@ export default defineComponent({
     doubleClick() {
       if (this.item?.kind === 'dir') {
         this.$emit('update', this.path + '/' + this.item?.name);
+      } else {
+        this.$emit('open', this.path + '/' + this.item?.name);
       }
     },
   },
@@ -110,6 +125,14 @@ export default defineComponent({
   padding: 10px;
   color: #ababab;
   font-size: 14px;
+
+  .icon {
+    width: 80px;
+  }
+
+  .icon_big {
+    width: 100%;
+  }
 
   img {
     display: block;

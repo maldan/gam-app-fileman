@@ -7,21 +7,53 @@
       v-if="isLoading"
       class="rotating"
       src="../asset/preload.svg"
-      style="width: 16px; margin-right: auto"
+      style="width: 16px; margin-right: 20px"
     />
+
+    <!-- Tabs -->
+    <div style="margin-right: auto; display: flex">
+      <div
+        v-for="(x, i) in tabs"
+        @click="$emit('tab', i)"
+        :key="i"
+        class="tab clickable"
+        :class="x === tab ? 'selected' : ''"
+      >
+        {{ i + 1 }}
+      </div>
+      <div class="tab clickable" @click="$emit('open', 'download')">Download</div>
+      <div class="tab clickable" @click="$emit('open', 'usage')">Usage</div>
+    </div>
+
+    <div @click="$emit('changeView', !isList)" class="selected_files clickable">
+      {{ isList ? 'List' : 'Block' }}
+    </div>
+
+    <!-- Sort mode -->
+    <div
+      v-if="list.filter((x) => x.isSelected).length"
+      @click="$emit('copy')"
+      class="selected_files clickable"
+    >
+      COPY
+    </div>
+    <div
+      v-if="list.filter((x) => x.isSelected).length"
+      @click="$emit('cut')"
+      class="selected_files clickable"
+    >
+      CUT
+    </div>
+    <div v-if="buffer.length" @click="$emit('paste')" class="selected_files clickable">PASTE</div>
 
     <!-- Sort mode -->
     <div @click="du()" class="selected_files clickable">DU</div>
 
     <!-- Sort mode -->
-    <div @click="changeSortBy()" class="selected_files clickable">by {{ sort }}</div>
+    <div @click="changeSortBy()" class="selected_files clickable">By {{ sort }}</div>
 
-    <div
-      @click="unselect()"
-      class="selected_files clickable"
-      v-if="list.filter((x) => x.isSelected).length"
-    >
-      {{ list.filter((x) => x.isSelected).length }}
+    <div @click="unselect()" class="selected_files clickable">
+      {{ list.filter((x) => x.isSelected).length }} / {{ list.length }}
     </div>
 
     <IconButton @click="selectFiles()" icon="upload" style="margin-right: 15px" />
@@ -41,6 +73,10 @@ export default defineComponent({
     path: String,
     list: Array,
     sort: String,
+    buffer: Array,
+    tabs: Array,
+    tab: Object,
+    isList: Boolean,
   },
   components: { IconButton },
   async mounted() {},
@@ -143,6 +179,22 @@ export default defineComponent({
     display: flex;
     align-items: center;
     font-weight: bold;
+  }
+
+  .tab {
+    padding: 0 10px;
+    background: #686868;
+    color: #b5b5b5;
+    border-radius: 3px;
+    margin-right: 15px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+
+    &.selected {
+      background: #2c589e;
+    }
   }
 }
 </style>

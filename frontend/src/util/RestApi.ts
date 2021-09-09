@@ -46,5 +46,62 @@ export const RestApi = {
         })
       ).data.response;
     },
+
+    async getPath() {
+      return (await Axios.get(`${API_URL}/file/path?path`)).data.response;
+    },
+    async setPath(path: string) {
+      return (await Axios.post(`${API_URL}/file/path?path=${path}`)).data.response;
+    },
+
+    async copy(from: string, to: string) {
+      return (
+        await Axios.post(`${API_URL}/file/copy`, {
+          from,
+          to,
+        })
+      ).data.response;
+    },
+
+    async move(from: string, to: string) {
+      return (
+        await Axios.post(`${API_URL}/file/move`, {
+          from,
+          to,
+        })
+      ).data.response;
+    },
+
+    async saveInfo(path: string, data: any) {
+      return (await Axios.post(`${API_URL}/file/info`, { path, data: JSON.stringify(data) })).data
+        .response;
+    },
+
+    async getInfo(path: string) {
+      try {
+        const d = (await Axios.get(`${API_URL}/file/info?path=${path}`)).data.response;
+        return JSON.parse(d);
+      } catch {
+        return {};
+      }
+    },
+  },
+  download: {
+    async getList() {
+      return (await Axios.get(`${API_URL}/download/list`)).data.response;
+    },
+    async add(url: string, path: string) {
+      return (
+        await Axios.post(`${API_URL}/download`, {
+          url,
+          path,
+        })
+      ).data.response;
+    },
+  },
+  disk: {
+    async getUsage(): Promise<any> {
+      return (await Axios.get(`${API_URL}/disk/usage`)).data.response;
+    },
   },
 };
