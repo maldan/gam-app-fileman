@@ -49,6 +49,7 @@ func (r DownloadApi) PostIndex(args core.Download) {
 	args.Created = time.Now()
 	args.Name = cmhp_crypto.UID(16)
 	DownloadList = append(DownloadList, &args)
+	os.MkdirAll(args.Path, 0777)
 
 	if strings.Contains(args.Url, "xvideos.com") {
 		go DownloadFromXvideos(&args, semaphoreChan)

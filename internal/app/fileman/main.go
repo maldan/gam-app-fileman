@@ -68,5 +68,8 @@ func Start(frontFs embed.FS) {
 			"download": api.DownloadApi{},
 			"disk":     api.DiskApi{},
 		},
+		"/system": map[string]interface{}{
+			"signal": api.SignalApi{},
+		},
 	})
 }
