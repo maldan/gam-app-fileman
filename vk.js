@@ -10,7 +10,7 @@
   .join(" ");
 
 // ==UserScript==
-// @name           Vk Copy Phoyo
+// @name           Vk Copy Photo
 // @description    Copy photo
 // @author         Maldan
 // @include        https://vk.com/feed*

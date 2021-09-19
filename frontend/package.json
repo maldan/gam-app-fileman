@@ -16,7 +16,9 @@
     "swipejs": "^2.3.1",
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
-    "vue-router": "^4.0.0-0"
+    "vue-click": "^2.1.4",
+    "vue-router": "^4.0.0-0",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
@@ -31,6 +33,7 @@
     "@vue/cli-plugin-unit-mocha": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
+    "@vue/devtools": "^5.3.4",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^7.0.0",
     "@vue/test-utils": "^2.0.0-0",

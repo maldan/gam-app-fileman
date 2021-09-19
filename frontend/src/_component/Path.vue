@@ -1,24 +1,18 @@
 <template>
   <div class="path">
-    <img
-      @click="isEditMode = !isEditMode"
-      style="margin-right: 15px"
-      src="../asset/icon/pencil.svg"
-      alt=""
-      draggable="false"
-    />
+    <IconButton @click="isEditMode = !isEditMode" icon="pencil" style="margin-right: 15px" />
     <input
       v-if="isEditMode"
       type="text"
-      :value="$store.state.path"
-      @change="$store.dispatch('changePath', $event.target.value), (isEditMode = false)"
+      :value="value"
+      @change="$emit('update', $event.target.value)"
     />
     <div v-if="!isEditMode" style="display: flex">
-      <div @click="$store.dispatch('changePath', '/')" class="part clickable">/</div>
+      <div @click="$emit('update', '/')" class="part clickable">/</div>
       <div
         @click="go(i)"
         class="part clickable"
-        v-for="(x, i) in $store.state.path.split('/').filter((x) => Boolean(x))"
+        v-for="(x, i) in value.split('/').filter((x) => Boolean(x))"
         :key="x"
       >
         {{ x }}
@@ -29,16 +23,19 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Helper } from '../util/Helper';
+import IconButton from '../component/IconButton.vue';
 
 export default defineComponent({
-  props: {},
-  components: {},
+  props: {
+    icon: String,
+    value: String,
+  },
+  components: { IconButton },
   async mounted() {},
   methods: {
     go(i: number) {
-      const tt = this.$store.state.path.split('/').filter((x: any) => Boolean(x)) || [];
-      this.$store.dispatch('changePath', '/' + tt.slice(0, i + 1).join('/'));
+      const tt = this.value?.split('/').filter((x) => Boolean(x)) || [];
+      this.$emit('update', '/' + tt.slice(0, i + 1).join('/'));
     },
   },
   data: () => {
@@ -53,9 +50,6 @@ export default defineComponent({
 .path {
   display: flex;
   align-items: center;
-  padding: 10px;
-  box-sizing: border-box;
-  background: #363636;
 
   input {
     flex: 1;

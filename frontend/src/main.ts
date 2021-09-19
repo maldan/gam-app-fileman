@@ -1,28 +1,19 @@
 import { createApp } from 'vue';
+// @ts-ignore
 import App from './App.vue';
-import router from './router';
+import Router from './router';
+import Store from './store';
 import './main.scss';
+import { init } from './gam_sdk_ui/vue/event';
+//import devtools from '@vue/devtools';
 
 const app = createApp(App);
-app.directive('doubleclick', {
-  created(el, binding, vnode, prevVnode) {
-    let counter = 0;
-    let lastClick = new Date();
-    el.addEventListener('click', (e: any) => {
-      if (new Date().getTime() - lastClick.getTime() > 800) {
-        counter = 0;
-        lastClick = new Date();
-        return;
-      }
 
-      lastClick = new Date();
-      counter += 1;
-      if (counter > 1) {
-        binding.value(e.pageX / window.innerWidth);
-        counter = 0;
-      }
-    });
-  },
-});
+init(app);
 
-app.use(router).mount('#app');
+app.config.globalProperties.$store = Store;
+app.use(Router).use(Store).mount('#app');
+
+if (process.env.NODE_ENV === 'development') {
+  //devtools.connect(/* host, port */);
+}
