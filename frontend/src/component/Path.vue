@@ -10,15 +10,15 @@
     <input
       v-if="isEditMode"
       type="text"
-      :value="$store.state.path"
+      :value="$store.state.main.path"
       @change="$store.dispatch('changePath', $event.target.value), (isEditMode = false)"
     />
     <div v-if="!isEditMode" style="display: flex">
-      <div @click="$store.dispatch('changePath', '/')" class="part clickable">/</div>
+      <div @click="$store.dispatch('main/changePath', '/')" class="part clickable">/</div>
       <div
         @click="go(i)"
         class="part clickable"
-        v-for="(x, i) in $store.state.path.split('/').filter((x) => Boolean(x))"
+        v-for="(x, i) in $store.state.main.path.split('/').filter((x) => Boolean(x))"
         :key="x"
       >
         {{ x }}
@@ -37,8 +37,8 @@ export default defineComponent({
   async mounted() {},
   methods: {
     go(i: number) {
-      const tt = this.$store.state.path.split('/').filter((x: any) => Boolean(x)) || [];
-      this.$store.dispatch('changePath', '/' + tt.slice(0, i + 1).join('/'));
+      const tt = this.$store.state.main.path.split('/').filter((x: any) => Boolean(x)) || [];
+      this.$store.dispatch('main/changePath', '/' + tt.slice(0, i + 1).join('/'));
     },
   },
   data: () => {

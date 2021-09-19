@@ -1,14 +1,21 @@
 import { RestApi } from '@/util/RestApi';
 import { createStore } from 'vuex';
+import main from './main';
+import modal from './modal';
+import file from './file';
 
 export default createStore({
-  state() {
+  modules: { main, modal, file },
+  /*state() {
     return {
       sortBy: 'name',
       path: '/',
       files: [],
+      buffer: [],
       lastSelectedFile: null,
       isLoading: false,
+      modal: '',
+      modalData: {},
     };
   },
   mutations: {
@@ -24,10 +31,22 @@ export default createStore({
     SET_LAST_SELECTED_FILE(state: any, payload: any) {
       state.lastSelectedFile = payload;
     },
+    SET_BUFFER(state: any, payload: any) {
+      state.buffer = payload;
+    },
+    SET_MODAL(state: any, payload: any) {
+      state.modal = payload.name;
+      state.modalData = payload.data;
+    },
   },
   actions: {
-    changePath({ commit, dispatch }, payload: any) {
+    async getPath({ commit, dispatch }) {
+      commit('SET_PATH', await RestApi.file.getPath());
+      dispatch('getFiles');
+    },
+    async changePath({ state, commit, dispatch }, payload: any) {
       commit('SET_PATH', payload.replace(/\/\//g, '/'));
+      await RestApi.file.setPath(state.path);
       dispatch('getFiles');
     },
     async getFiles({ state, commit, dispatch }) {
@@ -79,6 +98,7 @@ export default createStore({
         files[i].isSelected = false;
       }
       commit('SET_FILES', files);
+      commit('SET_LAST_SELECTED_FILE', null);
     },
     selectFile({ state, commit }, payload) {
       const files = state.files;
@@ -91,5 +111,23 @@ export default createStore({
       }
       commit('SET_FILES', files);
     },
-  },
+    copySelectedBuffer({ state, commit }) {
+      const buffer = [] as any[];
+      for (let i = 0; i < state.files.length; i++) {
+        if (state.files[i].isSelected) {
+          buffer.push((state.path + '/' + state.files[i].name).replace(/\/\//g, '/'));
+        }
+      }
+      commit('SET_BUFFER', buffer);
+    },
+    showModal({ commit }, payload) {
+      commit('SET_MODAL', payload);
+    },
+    closeModal({ commit }) {
+      commit('SET_MODAL', {});
+    },
+    modalOk({ commit }) {
+      commit('SET_MODAL', {});
+    },
+  },*/
 });

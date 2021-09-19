@@ -6,13 +6,14 @@ import Store from './store';
 import './main.scss';
 import { init } from './gam_sdk_ui/vue/event';
 //import devtools from '@vue/devtools';
+import UI from './gam_sdk_ui/vue/ui';
 
 const app = createApp(App);
 
 init(app);
 
 app.config.globalProperties.$store = Store;
-app.use(Router).use(Store).mount('#app');
+app.use(Router).use(Store).use(UI).mount('#app');
 
 if (process.env.NODE_ENV === 'development') {
   //devtools.connect(/* host, port */);

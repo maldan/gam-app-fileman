@@ -30,12 +30,12 @@ export default defineComponent({
       if (file.kind === 'file') {
         if (file.name.match(/\.(png|jpeg|gif|jpg|webp)$/)) {
           return `${(this.$root as any).API_URL}/file/imageThumbnail?path=${
-            this.$store.state.path
+            this.$store.state.main.path
           }/${file.name}`;
         }
         if (file.name.match(/\.(mp4|avi)$/)) {
           return `${(this.$root as any).API_URL}/file/videoThumbnail?path=${
-            this.$store.state.path
+            this.$store.state.main.path
           }/${file.name}`;
         }
         // @ts-ignore
@@ -46,7 +46,7 @@ export default defineComponent({
     },
     open() {
       if (this.file.kind === 'dir') {
-        this.$store.dispatch('changePath', this.$store.state.path + '/' + this.file.name);
+        this.$store.dispatch('main/changePath', this.$store.state.main.path + '/' + this.file.name);
       }
     },
   },

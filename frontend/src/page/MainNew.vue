@@ -6,10 +6,10 @@
     </div>
 
     <div class="body">
-      <div v-if="!$store.state.isLoading" class="files">
+      <div v-if="!$store.state.main.isLoading" class="files">
         <File
           @click.stop="selectFile($event, x)"
-          v-for="x in $store.state.files"
+          v-for="x in $store.state.file.list"
           :key="x.name"
           :file="x"
         />
@@ -17,6 +17,10 @@
     </div>
 
     <Footer />
+
+    <ui-modal v-if="$store.state.modal.name">
+      <component :is="$store.state.modal.name" />
+    </ui-modal>
   </div>
 </template>
 
@@ -26,63 +30,37 @@ import Header from '../component/Header.vue';
 import Footer from '../component/Footer.vue';
 import File from '../component/File.vue';
 import Path from '../component/Path.vue';
+import ModalName from '../component/modal/ModalName.vue';
 
 export default defineComponent({
-  components: { Header, Footer, File, Path },
+  components: { Header, Footer, File, Path, ModalName },
   async mounted() {
-    this.$store.dispatch('getFiles');
+    this.$store.dispatch('main/getPath');
 
     document.addEventListener('click', () => {
-      this.$store.dispatch('clearSelection');
+      this.$store.dispatch('file/clearSelection');
     });
   },
 
   methods: {
     selectFile(e: MouseEvent, x: any) {
-      // Hold control
-      /*if (e.ctrlKey) {
-        x.isSelected = !x.isSelected;
-        this.lastSelectedFile = x;
-        return;
-      }
-
-      // Hold shift
-      if (e.shiftKey && this.lastSelectedFile) {
-        const lastIndex = this.lastSelectedFile.index;
-        this.clearSelection();
-        let direction = x.index - lastIndex;
-        if (direction > 0) {
-          for (let i = 0; i <= direction; i++) {
-            // this.files[i + lastIndex].isSelected = true;
-          }
-        } else {
-          for (let i = 0; i <= -direction; i++) {
-            //this.files[lastIndex - i].isSelected = true;
-          }
-        }
-        return;
-      }
-      this.clearSelection();*/
-      //x.isSelected = true;
-      //this.lastSelectedFile = x;
-
       if (e.ctrlKey) {
-        this.$store.dispatch('selectFile', x);
-      } else if (e.shiftKey && this.$store.state.lastSelectedFile) {
-        const lastIndex = this.$store.state.lastSelectedFile.index;
+        this.$store.dispatch('file/select', x);
+      } else if (e.shiftKey && this.$store.state.file.lastSelected) {
+        const lastIndex = this.$store.state.file.lastSelected.index;
         let direction = x.index - lastIndex;
         if (direction > 0) {
           for (let i = 0; i <= direction; i++) {
-            this.$store.dispatch('selectFile', this.$store.state.files[i + lastIndex]);
+            this.$store.dispatch('file/select', this.$store.state.file.list[i + lastIndex]);
           }
         } else {
           for (let i = 0; i <= -direction; i++) {
-            this.$store.dispatch('selectFile', this.$store.state.files[lastIndex - i]);
+            this.$store.dispatch('file/select', this.$store.state.file.list[lastIndex - i]);
           }
         }
       } else {
-        this.$store.dispatch('clearSelection');
-        this.$store.dispatch('selectFile', x);
+        this.$store.dispatch('file/clearSelection');
+        this.$store.dispatch('file/select', x);
       }
     },
   },
