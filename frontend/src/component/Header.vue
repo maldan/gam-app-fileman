@@ -1,17 +1,15 @@
 <template>
   <div :class="$style.header">
+    <input ref="file_input" type="file" multiple style="position: fixed; left: -1000px" />
     <button
       @click="x.onClick()"
       v-for="x in buttons"
       :key="x.name"
       class="clickable"
       :style="{
-        opacity:
-          (x.isNeedFile && !$store.state.file.lastSelected) ||
-          (x.isNeedBuffer && !$store.state.file.buffer.length)
-            ? 0.5
-            : 1,
+        opacity: isDisabled(x) ? 0.5 : 1,
       }"
+      :disabled="isDisabled(x)"
     >
       <img :src="require(`../asset/icon/${x.icon}.svg`)" alt="" />
       {{ x.name }}
@@ -32,7 +30,7 @@ export default defineComponent({
         name: 'New Dir',
         onClick: () => {
           this.$store.dispatch('modal/show', {
-            name: 'modalName',
+            name: 'name',
             data: { title: 'Add new directory', name: '' },
             func: () => {
               this.$store.dispatch('file/createDir');
@@ -45,7 +43,7 @@ export default defineComponent({
         name: 'New File',
         onClick: () => {
           this.$store.dispatch('modal/show', {
-            name: 'modalName',
+            name: 'name',
             data: { title: 'Add new file', name: '' },
             func: () => {
               this.$store.dispatch('file/createFile');
@@ -61,7 +59,7 @@ export default defineComponent({
           this.$store.dispatch('file/copySelectedToBuffer');
 
           this.$store.dispatch('modal/show', {
-            name: 'modalName',
+            name: 'name',
             data: {
               title: 'Rename file/folder',
               name: this.$store.state.file.lastSelected.name,
@@ -77,7 +75,16 @@ export default defineComponent({
         name: 'Delete',
         isNeedFile: true,
         onClick: () => {
-          this.$store.dispatch('main/copySelectedBuffer');
+          this.$store.dispatch('file/copySelectedToBuffer');
+          this.$store.dispatch('modal/show', {
+            name: 'approve',
+            data: {
+              title: `Are you sure you want to delete these ${this.$store.state.file.buffer.length} files?`,
+            },
+            func: () => {
+              this.$store.dispatch('file/delete');
+            },
+          });
         },
       },
       {
@@ -85,7 +92,7 @@ export default defineComponent({
         name: 'Copy',
         isNeedFile: true,
         onClick: () => {
-          this.$store.dispatch('main/copySelectedBuffer');
+          this.$store.dispatch('file/copySelectedToBuffer', 'copy');
         },
       },
       {
@@ -93,21 +100,41 @@ export default defineComponent({
         name: 'Cut',
         isNeedFile: true,
         onClick: () => {
-          this.$store.dispatch('main/copySelectedBuffer');
+          this.$store.dispatch('file/copySelectedToBuffer', 'cut');
         },
       },
       {
         icon: 'add_file',
         name: 'Paste',
         isNeedBuffer: true,
+        onClick: () => {
+          this.$store.dispatch('file/paste');
+        },
       },
       {
         icon: 'upload',
         name: 'Upload',
+        onClick: () => {
+          const fileInput = this.$refs['file_input'] as HTMLInputElement;
+
+          if (fileInput) {
+            fileInput.onchange = (e: any) => {
+              this.$store.dispatch('file/upload', e.target.files);
+            };
+            fileInput.click();
+          }
+        },
       },
     ];
   },
-  methods: {},
+  methods: {
+    isDisabled(x: any) {
+      return (
+        (x.isNeedFile && !this.$store.state.file.lastSelected) ||
+        (x.isNeedBuffer && !this.$store.state.file.buffer.length)
+      );
+    },
+  },
   data: () => {
     return {
       buttons: [] as any[],

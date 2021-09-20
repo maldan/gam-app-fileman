@@ -207,6 +207,16 @@ func (r FileApi) DeleteDir(args core.CreateFile) {
 	cmhp_file.DeleteDir(args.Path)
 }
 
+// Delete any
+func (r FileApi) DeleteAny(args core.CreateFile) {
+	s, _ := os.Stat(args.Path)
+	if s.IsDir() {
+		r.DeleteDir(args)
+	} else {
+		r.DeleteFile(args)
+	}
+}
+
 // Copy file
 func (r FileApi) PostCopy(args ArgsRename) {
 	cmhp_process.Exec("cp", "-r", args.From, args.To)
@@ -214,7 +224,7 @@ func (r FileApi) PostCopy(args ArgsRename) {
 
 // Copy file
 func (r FileApi) PostMove(args ArgsRename) {
-	cmhp_process.Exec("mv", "-T", args.From, args.To)
+	cmhp_process.Exec("mv", args.From, args.To)
 }
 
 // Save file info

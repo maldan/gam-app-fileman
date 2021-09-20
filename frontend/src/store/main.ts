@@ -28,5 +28,8 @@ export default {
       await RestApi.file.setPath(state.path);
       dispatch('file/getList', null, { root: true });
     },
+    setLoading({ commit }: any, payload: any) {
+      commit('SET_LOADING', payload);
+    },
   },
 };

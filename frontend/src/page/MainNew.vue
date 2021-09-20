@@ -18,8 +18,12 @@
 
     <Footer />
 
+    <ui-modal v-if="$store.state.extension.name">
+      <component :is="'ext-' + $store.state.extension.name" />
+    </ui-modal>
+
     <ui-modal v-if="$store.state.modal.name">
-      <component :is="$store.state.modal.name" />
+      <component :is="'modal-' + $store.state.modal.name" />
     </ui-modal>
   </div>
 </template>
@@ -31,9 +35,11 @@ import Footer from '../component/Footer.vue';
 import File from '../component/File.vue';
 import Path from '../component/Path.vue';
 import ModalName from '../component/modal/ModalName.vue';
+import ModalApprove from '../component/modal/ModalApprove.vue';
+import ExtImage from '../component/extension/Image.vue';
 
 export default defineComponent({
-  components: { Header, Footer, File, Path, ModalName },
+  components: { Header, Footer, File, Path, ModalName, ModalApprove, ExtImage },
   async mounted() {
     this.$store.dispatch('main/getPath');
 

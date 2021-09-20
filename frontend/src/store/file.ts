@@ -7,6 +7,7 @@ export default {
       list: [],
       buffer: [],
       lastSelected: null,
+      bufferMode: 'copy',
     };
   },
   mutations: {
@@ -17,7 +18,8 @@ export default {
       state.lastSelected = payload;
     },
     SET_BUFFER(state: any, payload: any) {
-      state.buffer = payload;
+      state.buffer = payload.data;
+      state.bufferMode = payload.mode;
     },
   },
   actions: {
@@ -94,17 +96,17 @@ export default {
       }
       commit('SET_FILES', files);
     },
-    copySelectedToBuffer({ rootState, state, commit }: any) {
+    copySelectedToBuffer({ rootState, state, commit }: any, payload: string) {
       const buffer = [] as any[];
       for (let i = 0; i < state.list.length; i++) {
         if (state.list[i].isSelected) {
           buffer.push((rootState.main.path + '/' + state.list[i].name).replace(/\/\//g, '/'));
         }
       }
-      commit('SET_BUFFER', buffer);
+      commit('SET_BUFFER', { data: buffer, mode: payload });
     },
     clearBuffer({ commit }: any) {
-      commit('SET_BUFFER', []);
+      commit('SET_BUFFER', { data: [], mode: 'copy' });
     },
     async createFile({ dispatch, rootState }: any) {
       await RestApi.file.createFile(rootState.main.path + '/' + rootState.modal.data.name);
@@ -120,6 +122,33 @@ export default {
         rootState.main.path + '/' + rootState.modal.data.name,
       );
       dispatch('clearBuffer');
+      dispatch('getListSilent');
+    },
+    async delete({ dispatch, state }: any) {
+      for (let i = 0; i < state.buffer.length; i++) {
+        await RestApi.file.deleteAny(state.buffer[i]);
+      }
+      dispatch('clearBuffer');
+      dispatch('getListSilent');
+    },
+    async paste({ dispatch, state, rootState }: any) {
+      dispatch('main/setLoading', true, { root: true });
+      for (let i = 0; i < state.buffer.length; i++) {
+        if (state.bufferMode === 'copy') {
+          await RestApi.file.copy(state.buffer[i], rootState.main.path);
+        } else {
+          await RestApi.file.move(state.buffer[i], rootState.main.path);
+        }
+      }
+      dispatch('clearBuffer');
+      dispatch('getListSilent');
+      dispatch('main/setLoading', false, { root: true });
+    },
+    async upload({ dispatch, rootState }: any, payload: any) {
+      for (let i = 0; i < payload.length; i++) {
+        const path = rootState.main.path + '/' + new Date().getTime() + '_' + payload[i].name;
+        await RestApi.file.uploadFile(path, payload[i], () => {});
+      }
       dispatch('getListSilent');
     },
   },

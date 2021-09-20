@@ -48,6 +48,17 @@ export default defineComponent({
       if (this.file.kind === 'dir') {
         this.$store.dispatch('main/changePath', this.$store.state.main.path + '/' + this.file.name);
       }
+      if (this.file.kind === 'file') {
+        if (this.file.name.match(/\.(png|jpeg|gif|jpg|webp)$/)) {
+          this.$store.dispatch('extension/show', {
+            name: 'image',
+            data: {
+              index: this.file.index,
+              fullPath: this.$store.state.main.path + '/' + this.file.name,
+            },
+          });
+        }
+      }
     },
   },
   data: () => {

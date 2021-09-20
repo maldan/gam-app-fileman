@@ -33,6 +33,9 @@ export const RestApi = {
     async deleteDir(path: string) {
       return (await Axios.delete(`${API_URL}/file/dir?path=${path}`)).data.response;
     },
+    async deleteAny(path: string) {
+      return (await Axios.delete(`${API_URL}/file/any?path=${path}`)).data.response;
+    },
     async uploadFile(path: string, file: File, onProgess: (s: any) => void): Promise<string> {
       const formData = new FormData();
       formData.append(`file`, file, file.name);
