@@ -243,3 +243,37 @@ func (r FileApi) GetInfo(args core.Path) string {
 	}
 	return data
 }
+
+// Get file info
+func (r FileApi) GetFullInfo(args core.Path) core.FileFullInfo {
+	info, err := os.Stat(args.Path)
+	if err != nil {
+		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err.Error())
+	}
+
+	// Kind
+	kind := "file"
+	if info.IsDir() {
+		kind = "dir"
+	}
+	if fmt.Sprintf("%v", info.Mode())[0] == 'L' {
+		kind = "dir"
+	}
+
+	// Final info
+	fullInfo := core.FileFullInfo{
+		Name:    info.Name(),
+		Kind:    kind,
+		Size:    info.Size(),
+		Created: info.ModTime(),
+	}
+
+	// Get user
+	if stat, ok := info.Sys().(*syscall.Stat_t); ok {
+		u := strconv.FormatUint(uint64(stat.Uid), 10)
+		uu, _ := user.LookupId(u)
+		fullInfo.User = uu.Username
+	}
+
+	return fullInfo
+}

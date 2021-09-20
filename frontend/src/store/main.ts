@@ -4,7 +4,6 @@ export default {
   namespaced: true,
   state() {
     return {
-      sortBy: 'name',
       path: '/',
       isLoading: false,
     };

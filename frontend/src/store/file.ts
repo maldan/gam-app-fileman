@@ -8,6 +8,7 @@ export default {
       buffer: [],
       lastSelected: null,
       bufferMode: 'copy',
+      sortBy: 'name',
     };
   },
   mutations: {
@@ -20,6 +21,9 @@ export default {
     SET_BUFFER(state: any, payload: any) {
       state.buffer = payload.data;
       state.bufferMode = payload.mode;
+    },
+    SET_SORT(state: any, payload: string) {
+      state.sortBy = payload;
     },
   },
   actions: {
@@ -76,6 +80,18 @@ export default {
           return x;
         }),
       );
+    },
+    switchSort({ commit, state, dispatch }: any) {
+      if (state.sortBy === 'name') {
+        commit('SET_SORT', 'size');
+        dispatch('sort');
+      } else if (state.sortBy === 'size') {
+        commit('SET_SORT', 'created');
+        dispatch('sort');
+      } else if (state.sortBy === 'created') {
+        commit('SET_SORT', 'name');
+        dispatch('sort');
+      }
     },
     clearSelection({ state, commit }: any) {
       const files = state.list;

@@ -8,9 +8,22 @@
       style="width: 16px; margin-right: 20px"
     />
 
-    <button v-for="x in extensons" :key="x.name" class="clickable">
+    <!-- Buttons -->
+    <button v-for="x in extensions" @click="x.onClick()" :key="x.name" class="clickable">
       {{ x.name }}
     </button>
+
+    <!-- Info -->
+    <div :class="$style.info">
+      <div @click="$store.dispatch('file/switchSort')" class="clickable" :class="$style.item">
+        By {{ $store.state.file.sortBy }}
+      </div>
+      <div :class="$style.item">
+        {{ $store.state.file.list.filter((x) => x.isSelected).length }}
+        /
+        {{ $store.state.file.list.length }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -20,11 +33,32 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   props: {},
   components: {},
-  async mounted() {},
+  async mounted() {
+    this.extensions = [
+      {
+        name: 'Download Manager',
+        onClick: () => {
+          this.$store.dispatch(`extension/show`, {
+            name: 'download',
+            data: {},
+          });
+        },
+      },
+      {
+        name: 'Disk Usage',
+        onClick: () => {
+          this.$store.dispatch(`extension/show`, {
+            name: 'usage',
+            data: {},
+          });
+        },
+      },
+    ];
+  },
   methods: {},
   data: () => {
     return {
-      extensons: [{ name: 'Download Manager' }, { name: 'Disk Usage' }],
+      extensions: [] as any[],
     };
   },
 });
@@ -45,6 +79,22 @@ export default defineComponent({
     color: #fefefe;
     margin-right: 10px;
     border-radius: 2px;
+  }
+
+  .info {
+    margin-left: auto;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    .item {
+      background: #2d88ff;
+      padding: 2px 10px;
+      color: #fefefe;
+      border-radius: 2px;
+      font-size: 14px;
+      margin-left: 10px;
+    }
   }
 }
 </style>

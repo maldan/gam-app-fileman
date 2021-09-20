@@ -88,6 +88,11 @@ export const RestApi = {
         return {};
       }
     },
+
+    async getFullInfo(path: string): Promise<any> {
+      const d = (await Axios.get(`${API_URL}/file/fullInfo?path=${path}`)).data.response;
+      return d;
+    },
   },
   download: {
     async getList() {

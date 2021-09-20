@@ -125,6 +125,18 @@ export default defineComponent({
           }
         },
       },
+      {
+        icon: 'add_file',
+        name: 'Info',
+        isNeedFile: true,
+        onClick: () => {
+          this.$store.dispatch('file/copySelectedToBuffer');
+          this.$store.dispatch('extension/show', {
+            name: 'info',
+            data: {},
+          });
+        },
+      },
     ];
   },
   methods: {

@@ -10,6 +10,14 @@ type File struct {
 	Created time.Time `json:"created"`
 }
 
+type FileFullInfo struct {
+	Kind    string    `json:"kind"`
+	Name    string    `json:"name"`
+	User    string    `json:"user"`
+	Size    int64     `json:"size"`
+	Created time.Time `json:"created"`
+}
+
 type Download struct {
 	Url       string    `json:"url"`
 	Path      string    `json:"path"`

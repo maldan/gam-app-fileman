@@ -58,6 +58,15 @@ export default defineComponent({
             },
           });
         }
+        if (this.file.name.match(/\.(mp4|avi)$/)) {
+          this.$store.dispatch('extension/show', {
+            name: 'video',
+            data: {
+              index: this.file.index,
+              fullPath: this.$store.state.main.path + '/' + this.file.name,
+            },
+          });
+        }
       }
     },
   },
@@ -72,7 +81,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  // justify-content: center;
   padding: 10px;
   box-sizing: border-box;
 
