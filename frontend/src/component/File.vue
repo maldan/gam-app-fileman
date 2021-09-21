@@ -39,10 +39,10 @@ export default defineComponent({
           }/${file.name}`;
         }
         // @ts-ignore
-        return require('../asset/file/file.svg');
+        return require('../gam_sdk_ui/vue/asset/icon/file.svg');
       }
       // @ts-ignore
-      return require('../asset/file/folder.svg');
+      return require('../gam_sdk_ui/vue/asset/icon/folder.svg');
     },
     open() {
       if (this.file.kind === 'dir') {

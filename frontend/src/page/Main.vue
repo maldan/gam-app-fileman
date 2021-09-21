@@ -103,7 +103,7 @@ export default defineComponent({
   }
 
   .body {
-    height: calc(100% - 164px);
+    height: calc(100% - 158px);
     overflow-y: auto;
     margin-top: 10px;
 

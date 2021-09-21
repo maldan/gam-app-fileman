@@ -2,8 +2,8 @@
   <div :class="$style.footer">
     <!-- Preload -->
     <img
-      v-if="$store.state.isLoading"
-      class="rotating"
+      v-if="$store.state.main.isLoading"
+      class="animation_rotation"
       src="../asset/preload.svg"
       style="width: 16px; margin-right: 20px"
     />

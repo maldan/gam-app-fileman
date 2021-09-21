@@ -6,12 +6,9 @@
       v-for="x in buttons"
       :key="x.name"
       class="clickable"
-      :style="{
-        opacity: isDisabled(x) ? 0.5 : 1,
-      }"
       :disabled="isDisabled(x)"
     >
-      <img :src="require(`../asset/icon/${x.icon}.svg`)" alt="" />
+      <ui-icon :name="x.icon" />
       {{ x.name }}
     </button>
   </div>
@@ -26,7 +23,7 @@ export default defineComponent({
   async mounted() {
     this.buttons = [
       {
-        icon: 'add_folder',
+        icon: 'folder',
         name: 'New Dir',
         onClick: () => {
           this.$store.dispatch('modal/show', {
@@ -39,7 +36,7 @@ export default defineComponent({
         },
       },
       {
-        icon: 'add_file',
+        icon: 'file',
         name: 'New File',
         onClick: () => {
           this.$store.dispatch('modal/show', {
@@ -52,7 +49,7 @@ export default defineComponent({
         },
       },
       {
-        icon: 'add_file',
+        icon: 'rename',
         name: 'Rename',
         isNeedFile: true,
         onClick: () => {
@@ -71,7 +68,7 @@ export default defineComponent({
         },
       },
       {
-        icon: 'add_file',
+        icon: 'delete',
         name: 'Delete',
         isNeedFile: true,
         onClick: () => {
@@ -88,7 +85,7 @@ export default defineComponent({
         },
       },
       {
-        icon: 'add_file',
+        icon: 'copy',
         name: 'Copy',
         isNeedFile: true,
         onClick: () => {
@@ -96,7 +93,7 @@ export default defineComponent({
         },
       },
       {
-        icon: 'add_file',
+        icon: 'cut',
         name: 'Cut',
         isNeedFile: true,
         onClick: () => {
@@ -104,7 +101,7 @@ export default defineComponent({
         },
       },
       {
-        icon: 'add_file',
+        icon: 'paste',
         name: 'Paste',
         isNeedBuffer: true,
         onClick: () => {
@@ -126,7 +123,7 @@ export default defineComponent({
         },
       },
       {
-        icon: 'add_file',
+        icon: 'info',
         name: 'Info',
         isNeedFile: true,
         onClick: () => {
@@ -169,15 +166,15 @@ export default defineComponent({
     border: 0;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 7px;
     background: #1b1b1b;
     flex: 1;
     text-transform: uppercase;
     font-size: 12px;
 
     img {
-      display: block;
       margin-bottom: 12px;
+      height: 18px;
     }
   }
 }
