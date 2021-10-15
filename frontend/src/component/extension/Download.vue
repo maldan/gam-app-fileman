@@ -54,7 +54,10 @@ export default defineComponent({
     async add() {
       const list = this.url.split(' ');
       for (let i = 0; i < list.length; i++) {
-        await RestApi.download.add(list[i], (this.path + '/').replace(/\/\//g, '/'));
+        await RestApi.download.add(
+          list[i],
+          (this.$store.state.main.path + '/').replace(/\/\//g, '/'),
+        );
       }
 
       this.url = '';

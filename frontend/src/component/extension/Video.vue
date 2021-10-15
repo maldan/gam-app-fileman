@@ -62,6 +62,12 @@
       >
         Save Loop
       </button>
+
+      <button class="clickable" @click="changeVolume(-0.1)">Low</button>
+      <div style="width: 50px; text-align: center">
+        {{ $refs['video'].volume.toFixed(1) }}
+      </div>
+      <button class="clickable" @click="changeVolume(0.1)">High</button>
     </div>
   </div>
 </template>
@@ -185,6 +191,10 @@ export default defineComponent({
       const video = this.$refs['video'] as HTMLVideoElement;
       video.playbackRate += speed;
     },
+    changeVolume(amount: number) {
+      const video = this.$refs['video'] as HTMLVideoElement;
+      video.volume += amount;
+    },
     async saveInfo() {
       await RestApi.file.saveInfo(this.$store.state.extension.data.fullPath, {
         bookmark: this.bookmark,
@@ -243,7 +253,7 @@ export default defineComponent({
   .control {
     display: flex;
     align-items: center;
-    margin-top: 5px;
+    margin-top: 8px;
 
     button {
       background: #2c72e2;

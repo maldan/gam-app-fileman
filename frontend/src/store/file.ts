@@ -28,7 +28,7 @@ export default {
   },
   actions: {
     async getList({ commit, dispatch, rootState }: any) {
-      commit('main/SET_LOADING', true, { root: true });
+      dispatch('main/setLoading', true, { root: true });
       const files = await RestApi.file.getList(rootState.main.path);
       commit(
         'SET_FILES',
@@ -37,7 +37,7 @@ export default {
           return x;
         }),
       );
-      commit('main/SET_LOADING', false, { root: true });
+      dispatch('main/setLoading', false, { root: true });
 
       dispatch('sort');
     },

@@ -3,10 +3,11 @@ import { createStore } from 'vuex';
 import main from './main';
 import modal from './modal';
 import file from './file';
+import tab from './tab';
 import extension from './extension';
 
 export default createStore({
-  modules: { main, modal, file, extension },
+  modules: { main, modal, file, tab, extension },
   /*state() {
     return {
       sortBy: 'name',

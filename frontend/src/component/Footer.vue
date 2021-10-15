@@ -65,6 +65,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
+@import '../gam_sdk_ui/vue/main.scss';
+
 .footer {
   display: flex;
   flex: 1;
@@ -72,13 +74,8 @@ export default defineComponent({
   padding: 10px;
 
   button {
-    background: #2d88ff;
-    outline: none;
-    border: none;
-    padding: 5px 10px;
-    color: #fefefe;
+    @include base_button(#2d88ff, #fefefe, 5px 10px, 2px);
     margin-right: 10px;
-    border-radius: 2px;
   }
 
   .info {

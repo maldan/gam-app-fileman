@@ -24,17 +24,22 @@
         </div>
         <div>2</div> -->
 
-        <!-- <div v-for="x in $store.state.file.list" :key="x.name">
+        <div v-for="(x, i) in $store.state.file.list" :key="x.name">
           <img
             class="image"
-            :src="$root.API_URL + `/file/file?path=${$store.state.main.path + '/' + x.name}`"
+            :data-src="$root.API_URL + `/file/file?path=${$store.state.main.path + '/' + x.name}`"
             :style="isWidth ? { width: '100%' } : { height: '100%' }"
             draggable="false"
             loading="lazy"
+            :src="
+              i === $store.state.extension.data.index
+                ? $root.API_URL + `/file/file?path=${$store.state.main.path + '/' + x.name}`
+                : ''
+            "
           />
-        </div> -->
+        </div>
 
-        <div>
+        <!-- <div>
           <img
             class="image"
             :src="$root.API_URL + `/file/file?path=${prev()}`"
@@ -57,7 +62,7 @@
             :style="isWidth ? { width: '100%' } : { height: '100%' }"
             draggable="false"
           />
-        </div>
+        </div>-->
       </div>
     </div>
   </div>
@@ -85,7 +90,7 @@ export default defineComponent({
     //}
     // @ts-ignore
     window.mySwipe = new Swipe(this.$refs['slider'], {
-      startSlide: 1, //this.$store.state.extension.data.index,
+      startSlide: this.$store.state.extension.data.index,
       speed: 300,
       // auto: 3000,
       draggable: true,
@@ -94,8 +99,10 @@ export default defineComponent({
       stopPropagation: false,
       ignore: '.scroller',
       callback: (index, elem, dir) => {
-        //this.dir = dir;
-        //console.log(dir);
+        const img = elem.querySelector('img');
+        if (img) {
+          img.setAttribute('src', img.getAttribute('data-src') + '');
+        }
       },
       transitionEnd: (index, elem) => {
         //this.currentId += 1;
@@ -107,10 +114,12 @@ export default defineComponent({
 
     this.keyboardListener = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
-        this.next();
+        // @ts-ignore
+        window.mySwipe.next();
       }
       if (e.key === 'ArrowLeft') {
-        this.prev();
+        // @ts-ignore
+        window.mySwipe.prev();
       }
     };
     document.addEventListener('keydown', this.keyboardListener);

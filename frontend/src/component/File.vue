@@ -57,8 +57,7 @@ export default defineComponent({
               fullPath: this.$store.state.main.path + '/' + this.file.name,
             },
           });
-        }
-        if (this.file.name.match(/\.(mp4|avi)$/)) {
+        } else if (this.file.name.match(/\.(mp4|avi)$/)) {
           this.$store.dispatch('extension/show', {
             name: 'video',
             data: {
@@ -66,6 +65,13 @@ export default defineComponent({
               fullPath: this.$store.state.main.path + '/' + this.file.name,
             },
           });
+        } else {
+          window.open(
+            `${(this.$root as any).API_URL}/file/file?path=${
+              this.$store.state.main.path + '/' + this.file.name
+            }`,
+            '_blank',
+          );
         }
       }
     },

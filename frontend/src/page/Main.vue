@@ -3,6 +3,7 @@
     <div class="header">
       <Header />
       <Path />
+      <Tabs />
     </div>
 
     <div class="body">
@@ -34,6 +35,7 @@ import Header from '../component/Header.vue';
 import Footer from '../component/Footer.vue';
 import File from '../component/File.vue';
 import Path from '../component/Path.vue';
+import Tabs from '../component/Tabs.vue';
 import ModalName from '../component/modal/ModalName.vue';
 import ModalApprove from '../component/modal/ModalApprove.vue';
 import ExtImage from '../component/extension/Image.vue';
@@ -41,6 +43,7 @@ import ExtVideo from '../component/extension/Video.vue';
 import ExtUsage from '../component/extension/Usage.vue';
 import ExtDownload from '../component/extension/Download.vue';
 import ExtInfo from '../component/extension/Info.vue';
+import ExtPaste from '../component/extension/Paste.vue';
 
 export default defineComponent({
   components: {
@@ -48,6 +51,7 @@ export default defineComponent({
     Footer,
     File,
     Path,
+    Tabs,
     ModalName,
     ModalApprove,
     ExtImage,
@@ -55,6 +59,7 @@ export default defineComponent({
     ExtUsage,
     ExtDownload,
     ExtInfo,
+    ExtPaste,
   },
   async mounted() {
     this.$store.dispatch('main/getPath');
@@ -62,6 +67,32 @@ export default defineComponent({
     document.addEventListener('click', () => {
       this.$store.dispatch('file/clearSelection');
     });
+
+    // Paste image
+    document.onpaste = (event) => {
+      var items = event.clipboardData?.items || [];
+      for (const index in items) {
+        var item = items[index];
+        if (item.kind === 'file') {
+          var blob = item.getAsFile();
+          var reader = new FileReader();
+          reader.onload = (event) => {
+            // @ts-ignore
+            this.pasteData.image = event.target?.result || '';
+            // this.view = 'paste';
+            this.$store.dispatch('extension/show', {
+              name: 'paste',
+              data: {
+                image: this.pasteData.image,
+                file: this.pasteData.imageFile,
+              },
+            });
+          };
+          this.pasteData.imageFile = blob as File;
+          reader.readAsDataURL(blob as any);
+        }
+      }
+    };
   },
 
   methods: {
@@ -87,7 +118,12 @@ export default defineComponent({
     },
   },
   data: () => {
-    return {};
+    return {
+      pasteData: {
+        image: null as any,
+        imageFile: null as any,
+      },
+    };
   },
 });
 </script>
@@ -103,7 +139,7 @@ export default defineComponent({
   }
 
   .body {
-    height: calc(100% - 158px);
+    height: calc(100% - 198px);
     overflow-y: auto;
     margin-top: 10px;
 
