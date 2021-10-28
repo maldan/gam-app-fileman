@@ -83,6 +83,42 @@ func (f FileApi) GetImageThumbnail(args core.Path) *os.File {
 	return f1
 }
 
+// Set video thumbnail
+func (f FileApi) PostSetVideoPreview(args ArgsVideoPrevioew) *os.File {
+	// Temp file
+	os.MkdirAll(os.TempDir()+"/video_preview/", 0777)
+	tmpFile := os.TempDir() + "/video_preview/" + cmhp_crypto.Sha1(args.Path) + ".webp"
+
+	// Generate preview
+	/*frames := strings.Split(
+		cmhp_process.Exec(
+			"ffprobe", "-v", "error", "-select_streams",
+			"v:0", "-count_packets", "-show_entries",
+			"stream=nb_read_packets", "-of", "csv=p=0",
+			args.Path,
+		),
+		"\n",
+	)[0]
+	ff := cmhp_convert.StrToInt(frames)
+	fmt.Println(ff)*/
+
+	// Generate preview
+	cmhp_process.Exec("ffmpeg",
+		"-ss", args.Time,
+		"-i", args.Path,
+
+		//"-vf",
+		//fmt.Sprintf("select=eq(n\\,%v)", int(float64(ff)*args.Offset)),
+		"-frames:v", "1",
+		"-s", "256x256", tmpFile, "-y")
+
+	f1, err1 := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
+	if err1 != nil {
+		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err1.Error())
+	}
+	return f1
+}
+
 // Get file content
 func (f FileApi) GetFile(args core.Path) *os.File {
 	file, err := os.OpenFile(args.Path, os.O_RDONLY, 0777)

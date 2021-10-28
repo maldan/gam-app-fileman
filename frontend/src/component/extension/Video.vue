@@ -68,6 +68,18 @@
         {{ $refs['video'].volume.toFixed(1) }}
       </div>
       <button class="clickable" @click="changeVolume(0.1)">High</button>
+
+      <button
+        class="clickable"
+        @click="
+          $store.dispatch('file/setVideoPreview', {
+            path: $store.state.extension.data.fullPath,
+            time: current,
+          })
+        "
+      >
+        Set Preview
+      </button>
     </div>
   </div>
 </template>
@@ -89,9 +101,10 @@ export default defineComponent({
     //if (index !== -1) {
     //  this.currentId = index;
     //}
-
+    console.log(this.$refs['video']);
     setInterval(() => {
       const video = this.$refs['video'] as HTMLVideoElement;
+
       if (!video) return 0;
 
       this.progress = video.currentTime / video.duration;

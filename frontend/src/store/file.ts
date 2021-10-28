@@ -163,8 +163,12 @@ export default {
     async upload({ dispatch, rootState }: any, payload: any) {
       for (let i = 0; i < payload.length; i++) {
         const path = rootState.main.path + '/' + new Date().getTime() + '_' + payload[i].name;
-        await RestApi.file.uploadFile(path, payload[i], () => {});
+        await RestApi.file.uploadFile(path, payload[i]);
       }
+      dispatch('getListSilent');
+    },
+    async setVideoPreview({ dispatch }: any, payload: any) {
+      await RestApi.file.setVideoPreview(payload.path, payload.time);
       dispatch('getListSilent');
     },
   },

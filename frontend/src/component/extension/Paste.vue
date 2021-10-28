@@ -30,14 +30,10 @@ export default defineComponent({
           '_' +
           this.$store.state.extension.data.file.name,
         this.$store.state.extension.data.file,
-        (e) => {
-          // this.progress[i] = e.loaded / items[i].size;
-          // this.$emit('close');
-          // this.$emit('refresh');
-          this.$store.dispatch('extension/close');
-          this.$store.dispatch('file/getList');
-        },
       );
+
+      this.$store.dispatch('extension/close');
+      this.$store.dispatch('file/getList');
     },
   },
   data: () => {

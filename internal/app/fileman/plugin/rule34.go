@@ -24,6 +24,6 @@ func DownloadFromRule34(args *core.Download, ch chan int) {
 		Proxy: core.AppConfig.Proxy,
 	})
 
-	os.MkdirAll(args.Path+args.Name, 0777)
-	cmhp_file.WriteBin(args.Path+args.Name, image.Body)
+	os.MkdirAll(args.Path, 0777)
+	cmhp_file.WriteBin(args.Path+args.Name+".jpg", image.Body)
 }

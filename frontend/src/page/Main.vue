@@ -6,7 +6,7 @@
       <Tabs />
     </div>
 
-    <div class="body">
+    <div class="body" @dragover="dragOver" @dragleave="dragLeave" @drop="drop">
       <div v-if="!$store.state.main.isLoading" class="files">
         <File
           @click.stop="selectFile($event, x)"
@@ -44,6 +44,7 @@ import ExtUsage from '../component/extension/Usage.vue';
 import ExtDownload from '../component/extension/Download.vue';
 import ExtInfo from '../component/extension/Info.vue';
 import ExtPaste from '../component/extension/Paste.vue';
+import { RestApi } from '../util/RestApi';
 
 export default defineComponent({
   components: {
@@ -116,9 +117,35 @@ export default defineComponent({
         this.$store.dispatch('file/select', x);
       }
     },
+    dragOver(e: any) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.isDrag = true;
+    },
+
+    dragLeave() {
+      this.isDrag = false;
+    },
+
+    async drop(e: any) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.isDrag = false;
+
+      const files = e.dataTransfer.files;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const name = ~~(new Date().getTime() / 1000) + '_' + file.name;
+        await RestApi.file.uploadFile(this.$store.state.main.path + '/' + name, file);
+      }
+
+      this.$store.dispatch('file/getList');
+    },
   },
   data: () => {
     return {
+      isDrag: false,
       pasteData: {
         image: null as any,
         imageFile: null as any,
@@ -139,15 +166,30 @@ export default defineComponent({
   }
 
   .body {
-    height: calc(100% - 198px);
+    height: calc(100% - 188px);
     overflow-y: auto;
-    margin-top: 10px;
+    // margin-top: 10px;
+    position: relative;
 
     .files {
+      padding-top: 10px;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
       grid-auto-rows: max-content;
     }
+  }
+
+  .drag_file {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
   }
 }
 </style>

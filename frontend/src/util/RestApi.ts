@@ -36,7 +36,7 @@ export const RestApi = {
     async deleteAny(path: string) {
       return (await Axios.delete(`${API_URL}/file/any?path=${path}`)).data.response;
     },
-    async uploadFile(path: string, file: File, onProgess: (s: any) => void): Promise<string> {
+    async uploadFile(path: string, file: File): Promise<string> {
       const formData = new FormData();
       formData.append(`file`, file, file.name);
 
@@ -45,7 +45,6 @@ export const RestApi = {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-          onUploadProgress: onProgess,
         })
       ).data.response;
     },
@@ -92,6 +91,10 @@ export const RestApi = {
     async getFullInfo(path: string): Promise<any> {
       const d = (await Axios.get(`${API_URL}/file/fullInfo?path=${path}`)).data.response;
       return d;
+    },
+
+    async setVideoPreview(path: string, time: number) {
+      return (await Axios.post(`${API_URL}/file/setVideoPreview`, { path, time })).data.response;
     },
   },
   download: {
