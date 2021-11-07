@@ -54,7 +54,8 @@ document.addEventListener("keydown", async (e) => {
       }
       await r.json();
       if (CURRENT_ELEMENT) {
-        CURRENT_ELEMENT.style.border = "1px solid #00ff00";
+        CURRENT_ELEMENT.style.filter = "brightness(0.5)";
+        // CURRENT_ELEMENT.style.border = "1px solid #00ff00";
       }
     } catch {
       alert("Error");
@@ -72,12 +73,13 @@ setInterval(() => {
             .replace(/return showPhoto\('.*', '.*', (.*?), event\);?/gm, "$1")
         );
         PHOTO_DATA = y.temp.w || y.temp.z || y.temp.y || y.temp.x;
-        x.style.border = "1px solid #fe0000";
+        x.style.opacity = "0.5";
+        // x.style.border = "1px solid #fe0000";
         CURRENT_ELEMENT = x;
       } catch {}
     };
     x.onmouseout = () => {
-      x.style.border = "none";
+      x.style.opacity = "1";
       PHOTO_DATA = "";
       CURRENT_ELEMENT = null;
     };

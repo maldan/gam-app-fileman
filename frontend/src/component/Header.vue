@@ -1,16 +1,27 @@
 <template>
   <div :class="$style.header">
     <input ref="file_input" type="file" multiple style="position: fixed; left: -1000px" />
-    <button
+    <!-- <button
       @click="x.onClick()"
       v-for="x in buttons"
       :key="x.name"
       class="clickable"
       :disabled="isDisabled(x)"
     >
-      <ui-icon :name="x.icon" />
+      <ui-icon :size="17" :name="x.icon" />
       {{ x.name }}
-    </button>
+    </button> -->
+    <ui-button
+      @click="x.onClick()"
+      v-for="x in buttons"
+      :class="$style.button"
+      :key="x.name"
+      :icon="x.icon"
+      :text="x.name"
+      iconPosition="left"
+      :iconColor="x.color"
+      :disabled="isDisabled(x)"
+    />
   </div>
 </template>
 
@@ -38,6 +49,7 @@ export default defineComponent({
       {
         icon: 'file',
         name: 'New File',
+        color: '#b9b9b9',
         onClick: () => {
           this.$store.dispatch('modal/show', {
             name: 'name',
@@ -51,6 +63,7 @@ export default defineComponent({
       {
         icon: 'rename',
         name: 'Rename',
+        color: '#45a1ff',
         isNeedFile: true,
         onClick: () => {
           this.$store.dispatch('file/copySelectedToBuffer');
@@ -68,8 +81,9 @@ export default defineComponent({
         },
       },
       {
-        icon: 'delete',
+        icon: 'trash',
         name: 'Delete',
+        color: '#cf5144',
         isNeedFile: true,
         onClick: () => {
           this.$store.dispatch('file/copySelectedToBuffer');
@@ -87,14 +101,16 @@ export default defineComponent({
       {
         icon: 'copy',
         name: 'Copy',
+        color: '#fed300',
         isNeedFile: true,
         onClick: () => {
           this.$store.dispatch('file/copySelectedToBuffer', 'copy');
         },
       },
       {
-        icon: 'cut',
+        icon: 'scissors',
         name: 'Cut',
+        color: '#50b11f',
         isNeedFile: true,
         onClick: () => {
           this.$store.dispatch('file/copySelectedToBuffer', 'cut');
@@ -103,6 +119,7 @@ export default defineComponent({
       {
         icon: 'paste',
         name: 'Paste',
+        color: '#fed300',
         isNeedBuffer: true,
         onClick: () => {
           this.$store.dispatch('file/paste');
@@ -125,6 +142,7 @@ export default defineComponent({
       {
         icon: 'info',
         name: 'Info',
+        color: '#579aff',
         isNeedFile: true,
         onClick: () => {
           this.$store.dispatch('file/copySelectedToBuffer');
@@ -153,11 +171,21 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
+@import '../gam_sdk_ui/vue/style/color.scss';
+@import '../gam_sdk_ui/vue/style/size.scss';
+
 .header {
   display: flex;
   flex: 1;
 
-  button {
+  .button {
+    text-transform: uppercase;
+    font-size: 14px;
+    border-radius: 0;
+    background: $gray-dark;
+  }
+
+  /*button {
     background: none;
     color: #dadada;
     display: flex;
@@ -171,11 +199,6 @@ export default defineComponent({
     flex: 1;
     text-transform: uppercase;
     font-size: 12px;
-
-    img {
-      margin-bottom: 12px;
-      height: 18px;
-    }
-  }
+  }*/
 }
 </style>

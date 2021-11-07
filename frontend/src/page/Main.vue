@@ -166,7 +166,7 @@ export default defineComponent({
   }
 
   .body {
-    height: calc(100% - 188px);
+    height: calc(100% - 174px);
     overflow-y: auto;
     // margin-top: 10px;
     position: relative;

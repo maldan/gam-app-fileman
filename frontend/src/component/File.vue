@@ -5,11 +5,30 @@
         open();
       }
     "
-    class="file clickable"
-    :class="file.isSelected ? 'selected' : ''"
+    :class="[$style.file, 'clickable', file.isSelected ? $style.selected : '']"
   >
-    <img :class="'icon'" :src="icon(file)" alt="File" loading="lazy" draggable="false" />
-    <div class="name">{{ file.name }}</div>
+    <ui-icon
+      :class="$style.icon"
+      v-if="!isUseImage && file.kind === 'dir'"
+      name="folder"
+      color="#dd9c0b"
+    />
+    <ui-icon
+      :class="$style.icon"
+      v-if="!isUseImage && file.kind === 'file'"
+      name="file"
+      color="#9d9d9d"
+    />
+
+    <img
+      v-if="isUseImage"
+      :class="$style.image"
+      :src="icon(file)"
+      alt="File"
+      loading="lazy"
+      draggable="false"
+    />
+    <div :class="$style.name">{{ file.name }}</div>
   </div>
 </template>
 
@@ -21,6 +40,15 @@ export default defineComponent({
     file: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    isUseImage() {
+      if (this.file.kind === 'file') {
+        if (this.file.name.match(/\.(png|jpeg|gif|jpg|webp)$/)) return true;
+        if (this.file.name.match(/\.(mp4|avi)$/)) return true;
+      }
+      return false;
     },
   },
   components: {},
@@ -82,7 +110,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style module lang="scss">
 .file {
   display: flex;
   flex-direction: column;
@@ -101,7 +129,11 @@ export default defineComponent({
     background: #2d4b65;
   }
 
-  > img {
+  .icon {
+    height: 64px;
+  }
+
+  .image {
     max-width: 100%;
   }
 }
