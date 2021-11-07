@@ -19,7 +19,8 @@ func GetFileHash(path string) string {
 	}
 
 	// Get file hash
-	fileHash := strings.ReplaceAll(cmhp_process.Exec("sha1sum", path), "\n", "")
+	h, _ := cmhp_process.Exec("sha1sum", path)
+	fileHash := strings.ReplaceAll(h, "\n", "")
 	if fileHash == "" {
 		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", "Can't get file hash")
 	}

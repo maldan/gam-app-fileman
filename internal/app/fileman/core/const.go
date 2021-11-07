@@ -1,6 +1,10 @@
 package core
 
-import "time"
+import (
+	"time"
+
+	"github.com/maldan/go-rapi/rapi_core"
+)
 
 type File struct {
 	Kind    string    `json:"kind"`
@@ -35,8 +39,8 @@ type Usage struct {
 }
 
 type CreateFile struct {
-	Path  string `json:"path"`
-	Files [][]byte
+	Path  string           `json:"path"`
+	Files []rapi_core.File `json:"files"`
 }
 
 type Path struct {

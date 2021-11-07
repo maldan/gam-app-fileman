@@ -14,6 +14,7 @@ import (
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_process"
 	"github.com/maldan/go-cmhp/cmhp_slice"
+	"github.com/maldan/go-rapi/rapi_core"
 	"github.com/maldan/go-restserver"
 )
 
@@ -31,18 +32,18 @@ func (r FileApi) PostPath(args core.Path) {
 }
 
 // Get video thumbnail
-func (f FileApi) GetVideoThumbnail(args core.Path) *os.File {
+func (f FileApi) GetVideoThumbnail(ctx *rapi_core.Context, args core.Path) string {
+	ctx.IsServeFile = true
+
 	// Temp file
 	os.MkdirAll(os.TempDir()+"/video_preview/", 0777)
 	tmpFile := os.TempDir() + "/video_preview/" + cmhp_crypto.Sha1(args.Path) + ".webp"
 
 	// If file exists
 	if cmhp_file.Exists(tmpFile) {
-		f, err := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
-		if err != nil {
-			restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err.Error())
-		}
-		return f
+		// _, err := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
+		// rapi_core.FatalIfError(err)
+		return tmpFile
 	}
 
 	// Generate preview
@@ -51,36 +52,33 @@ func (f FileApi) GetVideoThumbnail(args core.Path) *os.File {
 		"select=eq(n\\,320)", "-frames:v", "1",
 		"-s", "256x256", tmpFile, "-y")
 
-	f1, err1 := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
-	if err1 != nil {
-		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err1.Error())
-	}
-	return f1
+	// _, err := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
+	// rapi_core.FatalIfError(err)
+	return tmpFile
 }
 
 // Get image thumbnail
-func (f FileApi) GetImageThumbnail(args core.Path) *os.File {
+func (f FileApi) GetImageThumbnail(ctx *rapi_core.Context, args core.Path) string {
+	ctx.IsServeFile = true
+
 	// Temp file
 	os.MkdirAll(os.TempDir()+"/image_preview/", 0777)
 	tmpFile := os.TempDir() + "/image_preview/" + cmhp_crypto.Sha1(args.Path) + ".webp"
 
 	// If file exists
 	if cmhp_file.Exists(tmpFile) {
-		f, err := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
-		if err != nil {
-			restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err.Error())
-		}
-		return f
+		// _, err := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
+		// rapi_core.FatalIfError(err)
+		return tmpFile
 	}
 
 	// Generate preview
 	cmhp_process.Exec("magick", args.Path, "-quality", "80", "-define", "webp:lossless=false", "-thumbnail", "256x256^", "-gravity", "center", "-extent", "256x256", tmpFile)
 
-	f1, err1 := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
-	if err1 != nil {
-		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err1.Error())
-	}
-	return f1
+	// _, err := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
+	// rapi_core.FatalIfError(err)
+
+	return tmpFile
 }
 
 // Set video thumbnail
@@ -120,25 +118,24 @@ func (f FileApi) PostSetVideoPreview(args ArgsVideoPrevioew) *os.File {
 }
 
 // Get file content
-func (f FileApi) GetFile(args core.Path) *os.File {
-	file, err := os.OpenFile(args.Path, os.O_RDONLY, 0777)
-	if err != nil {
-		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err.Error())
-	}
-	return file
+func (f FileApi) GetFile(ctx *rapi_core.Context, args core.Path) string {
+	ctx.IsServeFile = true
+	return args.Path
 }
 
 // Get file content
 func (f FileApi) GetDirSize(args core.Path) int64 {
-	out := cmhp_process.Exec("du", "-d", "0", "-b", args.Path)
+	out, _ := cmhp_process.Exec("du", "-d", "0", "-b", args.Path)
 	i, _ := strconv.ParseInt(strings.Split(out, "\t")[0], 10, 64)
 	return i
 }
 
 // Get list
 func (r FileApi) GetList(args core.Path) []core.File {
-	files, _ := cmhp_file.List(args.Path)
 	out := make([]core.File, 0)
+	files, err := cmhp_file.List(args.Path)
+	rapi_core.FatalIfError(err)
+
 	for _, file := range files {
 		kind := "file"
 		if file.IsDir() {
@@ -162,8 +159,10 @@ func (r FileApi) GetList(args core.Path) []core.File {
 		if err == nil {
 			if stat, ok := info.Sys().(*syscall.Stat_t); ok {
 				u := strconv.FormatUint(uint64(stat.Uid), 10)
-				uu, _ := user.LookupId(u)
-				outFile.User = uu.Username
+				uu, err1 := user.LookupId(u)
+				if err1 == nil {
+					outFile.User = uu.Username
+				}
 			}
 		}
 
@@ -208,7 +207,7 @@ func (f FileApi) PostOpen(args core.Path) {
 // Add new file
 func (r FileApi) PostFile(args core.CreateFile) {
 	if len(args.Files) > 0 {
-		cmhp_file.WriteBin(args.Path, args.Files[0])
+		cmhp_file.WriteBin(args.Path, args.Files[0].Data)
 	} else {
 		cmhp_file.WriteBin(args.Path, []byte{})
 	}

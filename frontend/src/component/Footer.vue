@@ -65,7 +65,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-@import '../gam_sdk_ui/vue/main.scss';
+@import '../gam_sdk_ui/vue/style/main.scss';
 
 .footer {
   display: flex;

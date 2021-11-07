@@ -9,6 +9,14 @@
 let PHOTO_DATA = "";
 let CURRENT_ELEMENT = null;
 
+const ddddd228 = () => {
+  const year = new Date().getFullYear();
+  const month = (`00` + (new Date().getMonth() + 1)).slice(-2);
+  const date = (`00` + new Date().getDate()).slice(-2);
+
+  return `${year}_${month}_${date}`;
+};
+
 document.addEventListener("keydown", async (e) => {
   if (e.key === "1" && PHOTO_DATA) {
     try {
@@ -23,7 +31,7 @@ document.addEventListener("keydown", async (e) => {
             appId: "maldan/fileman",
             data: JSON.stringify({
               type: "download_photo",
-              path: `/home/maldan/image/rule34/${new Date().getFullYear()}_${new Date().getMonth()}_${new Date().getDate()}`,
+              path: `/home/maldan/image/rule34/${ddddd228()}/`,
               url: PHOTO_DATA,
             }),
           }),

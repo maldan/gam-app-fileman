@@ -14,7 +14,7 @@ type DiskApi struct {
 
 // Download list
 func (r DiskApi) GetUsage() []core.Usage {
-	x := cmhp_process.Exec("df", "--output=used,size,source,target")
+	x, _ := cmhp_process.Exec("df", "--output=used,size,source,target")
 	lines := strings.Split(x, "\n")
 	space := regexp.MustCompile(`\s+`)
 	usageList := make([]core.Usage, 0)

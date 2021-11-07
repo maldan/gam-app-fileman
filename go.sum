@@ -9,6 +9,10 @@ github.com/k0kubun/pp v3.0.1+incompatible h1:3tqvf7QgUnZ5tXO6pNAZlrvHgl6DvifjDrd
 github.com/k0kubun/pp v3.0.1+incompatible/go.mod h1:GWse8YhT0p8pT4ir3ZgBbfZild3tgzSScAn6HmfYukg=
 github.com/maldan/go-cmhp v0.0.17 h1:je1TQTGEbm0CqVJZyOShyh7/G4L2JawBidLJmJUUQjI=
 github.com/maldan/go-cmhp v0.0.17/go.mod h1:AJPrAVJnjTv8gglY++g5Lz8igdiySEKee64ru2Ohno8=
+github.com/maldan/go-cmhp v0.0.20 h1:h8Vj8Di2DR1PTUENkVI/+NmfjxKEKSmG477cN99gDs0=
+github.com/maldan/go-cmhp v0.0.20/go.mod h1:AJPrAVJnjTv8gglY++g5Lz8igdiySEKee64ru2Ohno8=
+github.com/maldan/go-rapi v0.0.6 h1:xLrQv03B6bdsmVOjwDU3RnODI1Enqbf4V+MH8rZn0z0=
+github.com/maldan/go-rapi v0.0.6/go.mod h1:jL732c7fMVoFpvMNz+X60p2gyn682icp8QD9XMc0yA8=
 github.com/maldan/go-restserver v1.2.10 h1:EIsGb4D45qPFcoJofThuvP5LWJDfJyVRlUW/d+63aZI=
 github.com/maldan/go-restserver v1.2.10/go.mod h1:/A3cwalViFQhNuymAfTkXwqN0EC+sM7VaXaL9sFHzsM=
 github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ0s8=
