@@ -1,12 +1,24 @@
 import { RestApi } from '@/util/RestApi';
-import { createStore } from 'vuex';
+import { createStore, Store } from 'vuex';
 import main from './main';
 import modal from './modal';
 import file from './file';
 import tab from './tab';
 import extension from './extension';
+import { InjectionKey } from 'vue';
 
-export default createStore({
+// define your typings for the store state
+export interface State {
+  main: {
+    path: string;
+    isLoading: boolean;
+  };
+}
+
+// define injection key
+export const key: InjectionKey<Store<State>> = Symbol();
+
+export default createStore<State>({
   modules: { main, modal, file, tab, extension },
   /*state() {
     return {

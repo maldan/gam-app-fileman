@@ -4,10 +4,11 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"github.com/maldan/go-cmhp/cmhp_file"
+	"os"
 
 	"github.com/maldan/gam-app-fileman/internal/app/fileman/api"
 	"github.com/maldan/gam-app-fileman/internal/app/fileman/core"
-	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-rapi"
 	"github.com/maldan/go-rapi/rapi_core"
 	"github.com/maldan/go-rapi/rapi_rest"
@@ -30,19 +31,10 @@ func Start(frontFs embed.FS) {
 	core.Host = *host
 
 	// Read config
-	cmhp_file.ReadJSON(core.DataDir+"/config.json", &core.AppConfig)
-
-	/*restserver.Start(fmt.Sprintf("%s:%d", *host, *port), map[string]interface{}{
-		"/": restserver.VirtualFs{Root: "frontend/build/", Fs: frontFs},
-		"/api": map[string]interface{}{
-			"file":     api.FileApi{},
-			"download": api.DownloadApi{},
-			"disk":     api.DiskApi{},
-		},
-		"/system": map[string]interface{}{
-			"signal": api.SignalApi{},
-		},
-	})*/
+	_ = cmhp_file.ReadJSON(core.DataDir+"/config.json", &core.AppConfig)
+	if core.AppConfig.ThumbnailCachePath == "" {
+		core.AppConfig.ThumbnailCachePath = os.TempDir()
+	}
 
 	rapi.Start(rapi.Config{
 		Host: fmt.Sprintf("%s:%d", *host, *port),

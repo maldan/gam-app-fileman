@@ -12,7 +12,7 @@ import (
 
 func GetFileHash(path string) string {
 	// Get path hash
-	pathHash := cmhp_crypto.Sha1(path)
+	pathHash := cmhp_crypto.Sha1([]byte(path))
 	if cmhp_file.Exists("/tmp/file_hash/" + pathHash) {
 		hash, _ := cmhp_file.ReadText("/tmp/file_hash/" + pathHash)
 		return hash

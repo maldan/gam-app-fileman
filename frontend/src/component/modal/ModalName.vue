@@ -32,5 +32,6 @@ export default defineComponent({
 
 <style lang="scss" module>
 .modal {
+  min-width: 360px;
 }
 </style>

@@ -44,7 +44,7 @@ import ExtUsage from '../component/extension/Usage.vue';
 import ExtDownload from '../component/extension/Download.vue';
 import ExtInfo from '../component/extension/Info.vue';
 import ExtPaste from '../component/extension/Paste.vue';
-import { RestApi } from '../util/RestApi';
+import { RestApi } from '@/util/RestApi';
 
 export default defineComponent({
   components: {

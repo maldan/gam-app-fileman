@@ -39,8 +39,8 @@ type Usage struct {
 }
 
 type CreateFile struct {
-	Path  string           `json:"path"`
-	Files []rapi_core.File `json:"files"`
+	Path string         `json:"path"`
+	File rapi_core.File `json:"file"`
 }
 
 type Path struct {
@@ -48,10 +48,10 @@ type Path struct {
 }
 
 type Config struct {
-	Proxy string `json:"proxy"`
+	Proxy              string `json:"proxy"`
+	ThumbnailCachePath string `json:"thumbnailCachePath"`
 }
 
 var DataDir = ""
 var Host = ""
-var Folder = ""
 var AppConfig Config
