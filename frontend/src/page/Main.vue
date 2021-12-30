@@ -10,6 +10,10 @@
       <div v-if="!$store.state.main.isLoading" class="files">
         <File
           @click.stop="selectFile($event, x)"
+          @contextmenu="
+            selectFile($event, x);
+            showContextMenu($event);
+          "
           v-for="x in $store.state.file.list"
           :key="x.name"
           :file="x"
@@ -26,6 +30,49 @@
     <ui-modal v-if="$store.state.modal.name">
       <component :is="'modal-' + $store.state.modal.name" />
     </ui-modal>
+
+    <ui-context-menu
+      v-if="isShowContextMenu"
+      :items="[
+        {
+          label: 'Set Hash Name',
+          icon: 'rename',
+          onClick() {
+            $store.dispatch('file/setFileHashName');
+          },
+        },
+        {
+          label: 'Set Tags',
+          icon: 'pencil',
+          onClick() {
+            $store.dispatch('modal/show', {
+              name: 'tags',
+              data: {},
+              onSuccess: () => {},
+            });
+          },
+        },
+        {
+          label: 'Info',
+          icon: 'info',
+          onClick() {
+            $store.dispatch('extension/show', {
+              name: 'info',
+              data: {},
+            });
+          },
+        },
+        {
+          label: 'Move to tab',
+          icon: 'info',
+          async onClick() {
+            await $store.dispatch('file/copySelectedToBuffer', 'cut');
+            await $store.dispatch('file/move', $store.state.tab.tabs[1]);
+          },
+        },
+      ]"
+      :style="contextPosition"
+    />
   </div>
 </template>
 
@@ -63,17 +110,18 @@ export default defineComponent({
     ExtPaste,
   },
   async mounted() {
-    this.$store.dispatch('main/getPath');
+    await this.$store.dispatch('main/getPath');
 
     document.addEventListener('click', () => {
       this.$store.dispatch('file/clearSelection');
+      this.isShowContextMenu = false;
     });
 
     // Paste image
     document.onpaste = (event) => {
-      var items = event.clipboardData?.items || [];
+      const items = event.clipboardData?.items || [];
       for (const index in items) {
-        var item = items[index];
+        const item = items[index];
         if (item.kind === 'file') {
           var blob = item.getAsFile();
           var reader = new FileReader();
@@ -97,7 +145,15 @@ export default defineComponent({
   },
 
   methods: {
+    showContextMenu(e: MouseEvent) {
+      e.preventDefault();
+      this.isShowContextMenu = true;
+      this.contextPosition.left = e.pageX + 20 + 'px';
+      this.contextPosition.top = e.pageY + 20 + 'px';
+    },
     selectFile(e: MouseEvent, x: any) {
+      this.isShowContextMenu = false;
+
       if (e.ctrlKey) {
         this.$store.dispatch('file/select', x);
       } else if (e.shiftKey && this.$store.state.file.lastSelected) {
@@ -140,15 +196,20 @@ export default defineComponent({
         await RestApi.file.uploadFile(this.$store.state.main.path + '/' + name, file);
       }
 
-      this.$store.dispatch('file/getList');
+      await this.$store.dispatch('file/getList');
     },
   },
   data: () => {
     return {
       isDrag: false,
+      isShowContextMenu: false,
       pasteData: {
         image: null as any,
         imageFile: null as any,
+      },
+      contextPosition: {
+        left: '0',
+        top: '0',
       },
     };
   },
@@ -166,15 +227,15 @@ export default defineComponent({
   }
 
   .body {
-    height: calc(100% - 174px);
+    height: calc(100% - 175px);
     overflow-y: auto;
-    // margin-top: 10px;
     position: relative;
 
     .files {
       padding-top: 10px;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      grid-template-columns: repeat(1, 1fr);
       grid-auto-rows: max-content;
     }
   }
@@ -190,6 +251,18 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
     z-index: 1;
+  }
+}
+
+@for $i from 0 through 12 {
+  @media (min-width: #{575 + $i * 256}px) {
+    .main {
+      .body {
+        .files {
+          grid-template-columns: repeat(#{$i + 2}, 1fr);
+        }
+      }
+    }
   }
 }
 </style>

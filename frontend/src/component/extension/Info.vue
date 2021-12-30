@@ -19,14 +19,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { RestApi } from '../../util/RestApi';
+import { FileInfo } from '@/store/file';
 
 export default defineComponent({
   props: {},
   components: {},
   async mounted() {
     this.info = [];
-    for (let i = 0; i < this.$store.state.file.buffer.length; i++) {
-      this.info.push(await RestApi.file.getFullInfo(this.$store.state.file.buffer[i]));
+    const selectedFileList = this.$store.state.file.list.filter((x: FileInfo) => x.isSelected);
+
+    for (const file of selectedFileList) {
+      this.info.push(await RestApi.file.getFullInfo(file.path));
     }
   },
   methods: {},

@@ -1,10 +1,34 @@
 import { RestApi } from '@/util/RestApi';
+import { ActionContext } from 'vuex';
+import { MainTree } from '@/store/index';
+import Axios from 'axios';
+import { Helper } from '@/util/Helper';
+
+export interface FileInfo {
+  user: string;
+  created: string;
+  index: number;
+  isSelected: boolean;
+  kind: string;
+  name: string;
+  path: string;
+  size: number;
+}
+
+export interface FileStore {
+  list: FileInfo[];
+  buffer: any[];
+  lastSelected: unknown;
+  bufferMode: string;
+  sortBy: string;
+}
+export type FileActionContext = ActionContext<FileStore, MainTree>;
 
 export default {
   namespaced: true,
-  state() {
+  state(): FileStore {
     return {
-      list: [],
+      list: [] as FileInfo[],
       buffer: [],
       lastSelected: null,
       bufferMode: 'copy',
@@ -12,18 +36,18 @@ export default {
     };
   },
   mutations: {
-    SET_FILES(state: any, payload: any) {
+    SET_FILES(state: FileStore, payload: any): void {
       state.list = payload;
     },
-    SET_LAST_SELECTED(state: any, payload: any) {
+    SET_LAST_SELECTED(state: FileStore, payload: any): void {
       state.lastSelected = payload;
     },
-    SET_BUFFER(state: any, payload: any) {
+    SET_BUFFER(state: FileStore, payload: any): void {
       state.buffer = payload.data;
       state.bufferMode = payload.mode;
     },
-    SET_SORT(state: any, payload: string) {
-      state.sortBy = payload;
+    SET_SORT(state: FileStore, sortBy: string): void {
+      state.sortBy = sortBy;
     },
   },
   actions: {
@@ -160,6 +184,15 @@ export default {
       dispatch('getListSilent');
       dispatch('main/setLoading', false, { root: true });
     },
+    async move(action: FileActionContext, path: string): Promise<void> {
+      await action.dispatch('main/setLoading', true, { root: true });
+      for (let i = 0; i < action.state.buffer.length; i++) {
+        await RestApi.file.move(action.state.buffer[i], path);
+      }
+      await action.dispatch('clearBuffer');
+      await action.dispatch('getListSilent');
+      await action.dispatch('main/setLoading', false, { root: true });
+    },
     async upload({ dispatch, rootState }: any, payload: any) {
       for (let i = 0; i < payload.length; i++) {
         const path = rootState.main.path + '/' + new Date().getTime() + '_' + payload[i].name;
@@ -170,6 +203,19 @@ export default {
     async setVideoPreview({ dispatch }: any, payload: any) {
       await RestApi.file.setVideoPreview(payload.path, payload.time);
       dispatch('getListSilent');
+    },
+    async setFileHashName(action: FileActionContext): Promise<void> {
+      const selectedList = action.state.list.filter((file) => file.isSelected);
+      for (const file of selectedList) {
+        try {
+          await Axios.post(`${action.rootState.main.API_URL}/file/setHashName`, {
+            path: Helper.fixPath(`${action.rootState.main.path}/${file.name}`),
+          });
+        } catch (e) {
+          //
+        }
+      }
+      await action.dispatch('getListSilent');
     },
   },
 };

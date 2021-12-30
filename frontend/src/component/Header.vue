@@ -139,7 +139,7 @@ export default defineComponent({
           }
         },
       },
-      {
+      /*{
         icon: 'info',
         name: 'Info',
         color: '#579aff',
@@ -151,7 +151,7 @@ export default defineComponent({
             data: {},
           });
         },
-      },
+      },*/
     ];
   },
   methods: {

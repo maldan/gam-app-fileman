@@ -1,38 +1,52 @@
 import { RestApi } from '@/util/RestApi';
+import { ActionContext } from 'vuex';
+import { MainTree } from '.';
+import Axios from 'axios';
+
+export interface MainStore {
+  API_URL: string;
+  path: string;
+  isLoading: boolean;
+}
+export type MainActionContext = ActionContext<MainStore, MainTree>;
 
 export default {
   namespaced: true,
-  state() {
+  state(): MainStore {
     return {
+      API_URL: process.env.VUE_APP_API_URL || `${window.location.origin}/api`,
       path: '/',
       isLoading: false,
     };
   },
   mutations: {
-    SET_PATH(state: any, payload: any) {
-      state.path = payload;
+    SET_PATH(state: MainStore, path: string): void {
+      state.path = path;
     },
 
-    SET_LOADING(state: any, payload: boolean) {
-      state.isLoading = payload;
+    SET_LOADING(state: MainStore, status: boolean): void {
+      state.isLoading = status;
     },
   },
   actions: {
-    async getPath({ commit, dispatch }: any) {
-      commit('SET_PATH', await RestApi.file.getPath());
-      dispatch('file/getList', null, { root: true });
+    async getPath(action: MainActionContext): Promise<void> {
+      action.commit(
+        'SET_PATH',
+        (await Axios.get(`${action.rootState.main.API_URL}/file/path`)).data.response,
+      );
+      await action.dispatch('file/getList', null, { root: true });
     },
-    async changePath({ state, commit, dispatch }: any, path: string) {
-      commit('SET_PATH', path.replace(/\/\//g, '/'));
-      commit('SET_LOADING', true);
-      await RestApi.file.setPath(state.path);
-      commit('SET_LOADING', false);
-      dispatch('file/getList', null, { root: true });
-      dispatch('file/clearSelection', null, { root: true });
-      dispatch('tab/changePath', path, { root: true });
+    async changePath(action: MainActionContext, path: string): Promise<void> {
+      action.commit('SET_PATH', path.replace(/\/\//g, '/'));
+      action.commit('SET_LOADING', true);
+      await RestApi.file.setPath(action.state.path);
+      action.commit('SET_LOADING', false);
+      await action.dispatch('file/getList', null, { root: true });
+      await action.dispatch('file/clearSelection', null, { root: true });
+      await action.dispatch('tab/changePath', path, { root: true });
     },
-    setLoading({ commit }: any, payload: any) {
-      commit('SET_LOADING', payload);
+    setLoading(action: MainActionContext, status: boolean): void {
+      action.commit('SET_LOADING', status);
     },
   },
 };

@@ -2,13 +2,6 @@ package api
 
 import (
 	"fmt"
-	"os"
-	"os/user"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"syscall"
-
 	"github.com/maldan/gam-app-fileman/internal/app/fileman/core"
 	"github.com/maldan/go-cmhp/cmhp_crypto"
 	"github.com/maldan/go-cmhp/cmhp_file"
@@ -16,6 +9,13 @@ import (
 	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
 	"github.com/maldan/go-restserver"
+	"os"
+	"os/user"
+	"path"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"syscall"
 )
 
 type FileApi struct {
@@ -37,7 +37,11 @@ func (f FileApi) GetVideoThumbnail(ctx *rapi_core.Context, args core.Path) strin
 
 	// Temp file
 	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/", 0777)
-	tmpFile := core.AppConfig.ThumbnailCachePath + "/video_preview/" + cmhp_crypto.Sha1([]byte(args.Path)) + ".webp"
+	hash := cmhp_crypto.Sha1([]byte(args.Path))
+	f1 := hash[0:2]
+	f2 := hash[2:4]
+	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/"+f1+"/"+f2, 0777)
+	tmpFile := core.AppConfig.ThumbnailCachePath + "/video_preview/" + f1 + "/" + f2 + "/" + hash
 
 	// If file exists
 	if cmhp_file.Exists(tmpFile) {
@@ -48,7 +52,9 @@ func (f FileApi) GetVideoThumbnail(ctx *rapi_core.Context, args core.Path) strin
 	_, err := cmhp_process.Exec("ffmpeg",
 		"-i", args.Path, "-vf",
 		"select=eq(n\\,320)", "-frames:v", "1",
-		"-s", "256x256", tmpFile, "-y")
+		"-f", "webp",
+		"-vf", "scale=320:200:force_original_aspect_ratio=decrease",
+		tmpFile, "-y")
 	rapi_core.FatalIfError(err)
 
 	return tmpFile
@@ -60,7 +66,11 @@ func (f FileApi) GetImageThumbnail(ctx *rapi_core.Context, args core.Path) strin
 
 	// Temp file
 	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/image_preview/", 0777)
-	tmpFile := core.AppConfig.ThumbnailCachePath + "/image_preview/" + cmhp_crypto.Sha1([]byte(args.Path)) + ".webp"
+	hash := cmhp_crypto.Sha1([]byte(args.Path))
+	f1 := hash[0:2]
+	f2 := hash[2:4]
+	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/image_preview/"+f1+"/"+f2, 0777)
+	tmpFile := core.AppConfig.ThumbnailCachePath + "/image_preview/" + f1 + "/" + f2 + "/" + hash
 
 	// If file exists
 	if cmhp_file.Exists(tmpFile) {
@@ -69,47 +79,38 @@ func (f FileApi) GetImageThumbnail(ctx *rapi_core.Context, args core.Path) strin
 
 	// Generate preview
 	_, err := cmhp_process.Exec(
-		"magick", args.Path, "-quality", "80", "-define", "webp:lossless=false", "-thumbnail",
-		"256x256^", "-gravity", "center", "-extent", "256x256", tmpFile)
+		"magick", args.Path,
+		"-quality", "70",
+		// "-define", "g:format=png",
+		"-thumbnail", "192x192^",
+		"-gravity", "center",
+		"-extent", "192x192",
+		tmpFile)
+
 	rapi_core.FatalIfError(err)
 
 	return tmpFile
 }
 
 // Set video thumbnail
-func (f FileApi) PostSetVideoPreview(args ArgsVideoPrevioew) *os.File {
+func (f FileApi) PostSetVideoPreview(args ArgsVideoPrevioew) {
 	// Temp file
-	os.MkdirAll(os.TempDir()+"/video_preview/", 0777)
-	tmpFile := os.TempDir() + "/video_preview/" + cmhp_crypto.Sha1([]byte(args.Path)) + ".webp"
+	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/", 0777)
+	hash := cmhp_crypto.Sha1([]byte(args.Path))
+	f1 := hash[0:2]
+	f2 := hash[2:4]
+	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/"+f1+"/"+f2, 0777)
+	tmpFile := core.AppConfig.ThumbnailCachePath + "/video_preview/" + f1 + "/" + f2 + "/" + hash
 
 	// Generate preview
-	/*frames := strings.Split(
-		cmhp_process.Exec(
-			"ffprobe", "-v", "error", "-select_streams",
-			"v:0", "-count_packets", "-show_entries",
-			"stream=nb_read_packets", "-of", "csv=p=0",
-			args.Path,
-		),
-		"\n",
-	)[0]
-	ff := cmhp_convert.StrToInt(frames)
-	fmt.Println(ff)*/
-
-	// Generate preview
-	cmhp_process.Exec("ffmpeg",
+	_, err := cmhp_process.Exec("ffmpeg",
 		"-ss", args.Time,
 		"-i", args.Path,
-
-		//"-vf",
-		//fmt.Sprintf("select=eq(n\\,%v)", int(float64(ff)*args.Offset)),
 		"-frames:v", "1",
-		"-s", "256x256", tmpFile, "-y")
-
-	f1, err1 := os.OpenFile(tmpFile, os.O_RDONLY, 0777)
-	if err1 != nil {
-		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", err1.Error())
-	}
-	return f1
+		"-f", "webp",
+		"-vf", "scale=320:200:force_original_aspect_ratio=decrease",
+		tmpFile, "-y")
+	rapi_core.FatalIfError(err)
 }
 
 // Get file content
@@ -125,7 +126,7 @@ func (f FileApi) GetDirSize(args core.Path) int64 {
 	return i
 }
 
-// Get list
+// GetList Get list
 func (f FileApi) GetList(args core.Path) []core.File {
 	out := make([]core.File, 0)
 	files, err := cmhp_file.List(args.Path)
@@ -142,6 +143,7 @@ func (f FileApi) GetList(args core.Path) []core.File {
 
 		// Create file
 		outFile := core.File{
+			Path:    strings.ReplaceAll(args.Path+"/"+file.Name(), "//", "/"),
 			Name:    file.Name(),
 			User:    "",
 			Kind:    kind,
@@ -204,7 +206,7 @@ func (f FileApi) PostFile(args core.CreateFile) {
 	cmhp_file.WriteBin(args.Path, args.File.Data)
 }
 
-// Rename
+// PostRename Rename
 func (f FileApi) PostRename(args ArgsRename) {
 	err := os.Rename(args.From, args.To)
 	if err != nil {
@@ -302,4 +304,35 @@ func (f FileApi) GetFullInfo(args core.Path) core.FileFullInfo {
 	}
 
 	return fullInfo
+}
+
+// PostSetHashName Get file hash and set name as it
+func (f FileApi) PostSetHashName(args core.Path) {
+	hashName, err := cmhp_file.HashSha1(args.Path)
+	mimeType := core.GetFileMimeType(args.Path)
+	rapi_core.FatalIfError(err)
+	finalName := ""
+
+	// Check mime type
+	if mimeType == "image/png" {
+		finalName = hashName + ".png"
+	} else if mimeType == "image/jpeg" {
+		finalName = hashName + ".jpeg"
+	} else if mimeType == "image/gif" {
+		finalName = hashName + ".gif"
+	} else if mimeType == "image/webp" {
+		finalName = hashName + ".webp"
+	} else if mimeType == "video/mp4" {
+		finalName = hashName + ".mp4"
+	} else {
+		rapi_core.Fatal(rapi_core.Error{Code: 500, Description: "Unsupported file format"})
+	}
+
+	// Check if file already exists
+	newPath := path.Dir(args.Path) + "/" + finalName
+	if cmhp_file.Exists(newPath) {
+		rapi_core.Fatal(rapi_core.Error{Code: 500, Description: "File already exists"})
+	}
+
+	f.PostRename(ArgsRename{From: args.Path, To: newPath})
 }

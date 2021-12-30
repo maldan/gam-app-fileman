@@ -29,7 +29,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Helper } from '../util/Helper';
 
 export default defineComponent({
   props: {},

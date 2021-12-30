@@ -1,6 +1,8 @@
 package core
 
 import (
+	"github.com/h2non/filetype"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -28,4 +30,13 @@ func GetFileHash(path string) string {
 	os.MkdirAll("/tmp/file_hash", 0777)
 	cmhp_file.WriteText("/tmp/file_hash/"+pathHash, finalHash)
 	return finalHash
+}
+
+func GetFileMimeType(path string) string {
+	buf, err := ioutil.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	kind, _ := filetype.Match(buf)
+	return kind.MIME.Value
 }

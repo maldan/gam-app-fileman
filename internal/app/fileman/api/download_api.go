@@ -71,6 +71,11 @@ func (r DownloadApi) PostIndex(args core.Download) {
 		return
 	}
 
+	if strings.Contains(args.Url, "discordapp.net") {
+		go plugin.DownloadImage(&args, semaphoreChan)
+		return
+	}
+
 	restserver.Fatal(500, restserver.ErrorType.Unknown, "url", "Url not supported")
 }
 
