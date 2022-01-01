@@ -333,9 +333,10 @@ func (f FileApi) GetTags(args ArgsTags) map[string]interface{} {
 
 // PostSetHashName Get file hash and set name as it
 func (f FileApi) PostSetHashName(args core.Path) {
-	hashName, err := cmhp_file.HashSha1(args.Path)
+	hashName := core.Sha1Sum(args.Path)
+	// hashName, err := cmhp_file.HashSha1(args.Path)
 	mimeType := core.GetFileMimeType(args.Path)
-	rapi_core.FatalIfError(err)
+	// rapi_core.FatalIfError(err)
 	finalName := ""
 
 	// Check mime type
@@ -347,7 +348,7 @@ func (f FileApi) PostSetHashName(args core.Path) {
 		finalName = hashName + ".gif"
 	} else if mimeType == "image/webp" {
 		finalName = hashName + ".webp"
-	} else if mimeType == "video/mp4" {
+	} else if mimeType == "video/mp4" || mimeType == "video/quicktime" {
 		finalName = hashName + ".mp4"
 	} else {
 		rapi_core.Fatal(rapi_core.Error{Code: 500, Description: "Unsupported file format"})

@@ -20,14 +20,14 @@
       color="#9d9d9d"
     />
 
-    <img
-      v-if="isUseImage"
-      :class="$style.image"
-      :src="icon(file)"
-      alt="File"
-      loading="lazy"
-      draggable="false"
-    />
+    <div :class="$style.image" v-if="isUseImage">
+      <div :class="$style.info">
+        <div v-if="file.name.split('.')[0].length === 40" :class="$style.hash">H</div>
+        <div v-if="file.tags?.path" :class="$style.tag">T</div>
+        <div :class="$style.size">{{ $root.pretty(file.size) }}</div>
+      </div>
+      <img :src="icon(file)" alt="File" loading="lazy" draggable="false" />
+    </div>
     <div :class="$style.name">{{ file.tags?.title || file.name }}</div>
   </div>
 </template>
@@ -133,7 +133,36 @@ export default defineComponent({
   }
 
   .image {
-    max-width: 100%;
+    position: relative;
+
+    .info {
+      position: absolute;
+      right: 5px;
+      bottom: 8px;
+      display: flex;
+
+      .tag,
+      .size,
+      .hash {
+        background-color: #19aa00;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-left: 5px;
+      }
+
+      .tag {
+        background-color: #e75a25;
+      }
+
+      .hash {
+        background-color: #bd25e7;
+      }
+    }
+
+    img {
+      max-width: 100%;
+    }
   }
 }
 </style>

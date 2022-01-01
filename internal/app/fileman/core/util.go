@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/h2non/filetype"
+	"github.com/maldan/go-rapi/rapi_core"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -11,6 +12,19 @@ import (
 	"github.com/maldan/go-cmhp/cmhp_process"
 	"github.com/maldan/go-restserver"
 )
+
+func Sha1Sum(path string) string {
+	// Get file hash
+	h, err := cmhp_process.Exec("sha1sum", path)
+	rapi_core.FatalIfError(err)
+
+	fileHash := strings.ReplaceAll(h, "\n", "")
+	if fileHash == "" {
+		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", "Can't get file hash")
+	}
+
+	return strings.Trim(strings.Split(fileHash, " ")[0], " ")
+}
 
 func GetFileHash(path string) string {
 	// Get path hash
