@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/user"
 	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -32,12 +31,12 @@ func (f FileApi) PostPath(args core.Path) {
 }
 
 // GetVideoThumbnail Get video thumbnail
-func (f FileApi) GetVideoThumbnail(ctx *rapi_core.Context, args core.Path) string {
+func (f FileApi) GetVideoThumbnail(ctx *rapi_core.Context, args ArgsVideoPreview) string {
 	ctx.IsServeFile = true
 
 	// Temp file
 	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/", 0777)
-	hash := cmhp_crypto.Sha1([]byte(args.Path))
+	hash := cmhp_crypto.Sha1([]byte(args.Path + "" + args.Time))
 	f1 := hash[0:2]
 	f2 := hash[2:4]
 	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/"+f1+"/"+f2, 0777)
@@ -50,8 +49,9 @@ func (f FileApi) GetVideoThumbnail(ctx *rapi_core.Context, args core.Path) strin
 
 	// Generate preview
 	_, err := cmhp_process.Exec("ffmpeg",
-		"-i", args.Path, "-vf",
-		"select=eq(n\\,320)", "-frames:v", "1",
+		"-ss", args.Time,
+		"-i", args.Path,
+		"-frames:v", "1",
 		"-f", "webp",
 		"-vf", "scale=320:200:force_original_aspect_ratio=decrease",
 		tmpFile, "-y")
@@ -93,24 +93,11 @@ func (f FileApi) GetImageThumbnail(ctx *rapi_core.Context, args core.Path) strin
 }
 
 // PostSetVideoPreview Set video thumbnail
-func (f FileApi) PostSetVideoPreview(args ArgsVideoPrevioew) {
-	// Temp file
-	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/", 0777)
-	hash := cmhp_crypto.Sha1([]byte(args.Path))
-	f1 := hash[0:2]
-	f2 := hash[2:4]
-	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/"+f1+"/"+f2, 0777)
-	tmpFile := core.AppConfig.ThumbnailCachePath + "/video_preview/" + f1 + "/" + f2 + "/" + hash
-
-	// Generate preview
-	_, err := cmhp_process.Exec("ffmpeg",
-		"-ss", args.Time,
-		"-i", args.Path,
-		"-frames:v", "1",
-		"-f", "webp",
-		"-vf", "scale=320:200:force_original_aspect_ratio=decrease",
-		tmpFile, "-y")
-	rapi_core.FatalIfError(err)
+func (f FileApi) PostSetVideoPreview(args ArgsVideoPreview) {
+	// Get tags
+	tags := f.GetTags(ArgsTags{Path: args.Path})
+	tags["videoPreviewTime"] = args.Time
+	f.PostTags(ArgsTags{Path: args.Path, Tags: tags})
 }
 
 // Get file content
@@ -172,7 +159,7 @@ func (f FileApi) GetList(args core.Path) []core.File {
 }
 
 // PostOpen Open file
-func (f FileApi) PostOpen(args core.Path) {
+/*func (f FileApi) PostOpen(args core.Path) {
 	appName := ""
 
 	// If image
@@ -201,7 +188,7 @@ func (f FileApi) PostOpen(args core.Path) {
 		fmt.Sprintf("--file=%v", args.Path),
 		fmt.Sprintf("--folder=%v", filepath.Dir(args.Path)),
 	)
-}
+}*/
 
 // Add new file
 func (f FileApi) PostFile(args core.CreateFile) {
@@ -258,21 +245,21 @@ func (f FileApi) PostMove(args ArgsRename) {
 }
 
 // Save file info
-func (f FileApi) PostInfo(args ArgsFileInfo) {
+/*func (f FileApi) PostInfo(args ArgsFileInfo) {
 	fileHash := core.GetFileHash(args.Path)
 	os.MkdirAll(core.DataDir+"/file_info", 0777)
 	cmhp_file.WriteText(core.DataDir+"/file_info/"+fileHash+".json", args.Data)
-}
+}*/
 
 // Get file info
-func (f FileApi) GetInfo(args core.Path) string {
+/*func (f FileApi) GetInfo(args core.Path) string {
 	fileHash := core.GetFileHash(args.Path)
 	data, err := cmhp_file.ReadText(core.DataDir + "/file_info/" + fileHash + ".json")
 	if err != nil {
 		restserver.Fatal(500, restserver.ErrorType.Unknown, "path", "Can't get file hash")
 	}
 	return data
-}
+}*/
 
 // Get file info
 func (f FileApi) GetFullInfo(args core.Path) core.FileFullInfo {
@@ -316,7 +303,14 @@ func (f FileApi) PostTags(args ArgsTags) {
 	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/tags/"+f1+"/"+f2, 0777)
 	tagFile := core.AppConfig.ThumbnailCachePath + "/tags/" + f1 + "/" + f2 + "/" + fileHash
 
-	err := cmhp_file.WriteText(tagFile, args.Data)
+	if args.Tags == nil {
+		args.Tags = make(map[string]interface{}, 0)
+	}
+
+	// Set default tags
+	args.Tags["path"] = args.Path
+
+	err := cmhp_file.WriteJSON(tagFile, &args.Tags)
 	rapi_core.FatalIfError(err)
 }
 

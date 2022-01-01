@@ -28,12 +28,13 @@
       loading="lazy"
       draggable="false"
     />
-    <div :class="$style.name">{{ file.name }}</div>
+    <div :class="$style.name">{{ file.tags?.title || file.name }}</div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { FileInfo } from '@/store/file';
 
 export default defineComponent({
   props: {
@@ -54,17 +55,15 @@ export default defineComponent({
   components: {},
   async mounted() {},
   methods: {
-    icon(file: any): any {
+    icon(file: FileInfo): any {
       if (file.kind === 'file') {
         if (file.name.match(/\.(png|jpeg|gif|jpg|webp)$/)) {
-          return `${(this.$root as any).API_URL}/file/imageThumbnail?path=${
-            this.$store.state.main.path
-          }/${file.name}`;
+          return `${(this.$root as any).API_URL}/file/imageThumbnail?path=${file.path}`;
         }
         if (file.name.match(/\.(mp4|avi)$/)) {
-          return `${(this.$root as any).API_URL}/file/videoThumbnail?path=${
-            this.$store.state.main.path
-          }/${file.name}`;
+          return `${(this.$root as any).API_URL}/file/videoThumbnail?path=${file.path}&time=${
+            file.tags?.videoPreviewTime || '00:00:00'
+          }`;
         }
         // @ts-ignore
         return require('../gam_sdk_ui/vue/asset/icon/file.svg');

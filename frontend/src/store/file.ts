@@ -13,6 +13,7 @@ export interface FileInfo {
   name: string;
   path: string;
   size: number;
+  tags: Record<string, string | number | boolean>;
 }
 
 export interface FileStore {
@@ -224,13 +225,17 @@ export default {
       const selectedList = action.state.list.filter((file) => file.isSelected);
       const file = selectedList[0];
       if (file) {
-        const tags: Record<string, string> = {};
+        const tags: Record<string, unknown> = {};
         for (const x of action.rootState.modal.data.tags) {
-          tags[x.key] = x.value;
+          if (x.value === 'true') tags[x.key] = true;
+          else if (x.value === 'false') tags[x.key] = false;
+          else if (x.value.match(/^-?\d+$/)) {
+            tags[x.key] = Number.parseFloat(x.value);
+          } else tags[x.key] = x.value;
         }
         await Axios.post(`${action.rootState.main.API_URL}/file/tags`, {
           path: file.path,
-          data: JSON.stringify(tags),
+          tags: tags,
         });
       }
 
