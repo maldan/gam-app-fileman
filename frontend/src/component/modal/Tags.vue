@@ -44,7 +44,7 @@ export default defineComponent({
 
     .field {
       display: flex;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
   }
 }
