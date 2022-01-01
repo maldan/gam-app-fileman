@@ -1,7 +1,6 @@
-import { RestApi } from '@/util/RestApi';
 import { createStore, Store } from 'vuex';
 import main, { MainStore } from './main';
-import modal from './modal';
+import modal, { ModalStore } from '../gam_sdk_ui/vue/store/modal';
 import file from './file';
 import tab from './tab';
 import extension from './extension';
@@ -10,6 +9,7 @@ import { InjectionKey } from 'vue';
 // define your typings for the store state
 export interface MainTree {
   main: MainStore;
+  modal: ModalStore;
 }
 
 // define injection key

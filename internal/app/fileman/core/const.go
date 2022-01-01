@@ -1,21 +1,23 @@
 package core
 
 import (
-	"time"
-
 	"github.com/maldan/go-rapi/rapi_core"
+	"time"
 )
 
 type File struct {
-	Kind    string    `json:"kind"`
-	Name    string    `json:"name"`
-	User    string    `json:"user"`
-	Size    int64     `json:"size"`
-	Created time.Time `json:"created"`
+	Kind    string                 `json:"kind"`
+	Path    string                 `json:"path"`
+	Name    string                 `json:"name"`
+	User    string                 `json:"user"`
+	Size    int64                  `json:"size"`
+	Tags    map[string]interface{} `json:"tags"`
+	Created time.Time              `json:"created"`
 }
 
 type FileFullInfo struct {
 	Kind    string    `json:"kind"`
+	Path    string    `json:"path"`
 	Name    string    `json:"name"`
 	User    string    `json:"user"`
 	Size    int64     `json:"size"`

@@ -12,3 +12,7 @@ type ArgsVideoPrevioew struct {
 	Path string `json:"path"`
 	Time string `json:"time"`
 }
+type ArgsTags struct {
+	Path string `json:"path"`
+	Data string `json:"data"`
+}

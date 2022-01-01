@@ -92,7 +92,7 @@ func (f FileApi) GetImageThumbnail(ctx *rapi_core.Context, args core.Path) strin
 	return tmpFile
 }
 
-// Set video thumbnail
+// PostSetVideoPreview Set video thumbnail
 func (f FileApi) PostSetVideoPreview(args ArgsVideoPrevioew) {
 	// Temp file
 	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/video_preview/", 0777)
@@ -142,13 +142,15 @@ func (f FileApi) GetList(args core.Path) []core.File {
 		}
 
 		// Create file
+		filePath := strings.ReplaceAll(args.Path+"/"+file.Name(), "//", "/")
 		outFile := core.File{
-			Path:    strings.ReplaceAll(args.Path+"/"+file.Name(), "//", "/"),
+			Path:    filePath,
 			Name:    file.Name(),
 			User:    "",
 			Kind:    kind,
 			Size:    file.Size(),
 			Created: file.ModTime(),
+			Tags:    f.GetTags(ArgsTags{Path: filePath}),
 		}
 
 		// Get user
@@ -304,6 +306,35 @@ func (f FileApi) GetFullInfo(args core.Path) core.FileFullInfo {
 	}
 
 	return fullInfo
+}
+
+// PostTags Get file hash and set name as it
+func (f FileApi) PostTags(args ArgsTags) {
+	fileHash := strings.Split(path.Base(args.Path), ".")[0]
+	f1 := fileHash[0:2]
+	f2 := fileHash[2:4]
+	_ = os.MkdirAll(core.AppConfig.ThumbnailCachePath+"/tags/"+f1+"/"+f2, 0777)
+	tagFile := core.AppConfig.ThumbnailCachePath + "/tags/" + f1 + "/" + f2 + "/" + fileHash
+
+	err := cmhp_file.WriteText(tagFile, args.Data)
+	rapi_core.FatalIfError(err)
+}
+
+// GetTags Get file tags
+func (f FileApi) GetTags(args ArgsTags) map[string]interface{} {
+	tags := make(map[string]interface{}, 0)
+
+	fileHash := strings.Split(path.Base(args.Path), ".")[0]
+	if len(fileHash) < 4 {
+		return tags
+	}
+
+	f1 := fileHash[0:2]
+	f2 := fileHash[2:4]
+	tagFile := core.AppConfig.ThumbnailCachePath + "/tags/" + f1 + "/" + f2 + "/" + fileHash
+
+	cmhp_file.ReadJSON(tagFile, &tags)
+	return tags
 }
 
 // PostSetHashName Get file hash and set name as it

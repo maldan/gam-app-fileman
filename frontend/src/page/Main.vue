@@ -33,6 +33,7 @@
 
     <ui-context-menu
       v-if="isShowContextMenu"
+      @close="isShowContextMenu = false"
       :items="[
         {
           label: 'Set Hash Name',
@@ -44,11 +45,19 @@
         {
           label: 'Set Tags',
           icon: 'pencil',
-          onClick() {
-            $store.dispatch('modal/show', {
+          async onClick() {
+            const tags = [];
+            for (x in $store.state.file.lastSelected.tags)
+              tags.push({ key: x, value: $store.state.file.lastSelected.tags[x] });
+
+            await $store.dispatch('modal/show', {
               name: 'tags',
-              data: {},
-              onSuccess: () => {},
+              data: {
+                tags,
+              },
+              onSuccess: () => {
+                $store.dispatch('file/setTags');
+              },
             });
           },
         },
@@ -114,7 +123,7 @@ export default defineComponent({
 
     document.addEventListener('click', () => {
       this.$store.dispatch('file/clearSelection');
-      this.isShowContextMenu = false;
+      // this.isShowContextMenu = false;
     });
 
     // Paste image

@@ -49,6 +49,9 @@ export default {
     SET_SORT(state: FileStore, sortBy: string): void {
       state.sortBy = sortBy;
     },
+    SET_TAGS(state: FileStore, tags: any): void {
+      // state.tags = tags;
+    },
   },
   actions: {
     async getList({ commit, dispatch, rootState }: any) {
@@ -215,6 +218,22 @@ export default {
           //
         }
       }
+      await action.dispatch('getListSilent');
+    },
+    async setTags(action: FileActionContext): Promise<void> {
+      const selectedList = action.state.list.filter((file) => file.isSelected);
+      const file = selectedList[0];
+      if (file) {
+        const tags: Record<string, string> = {};
+        for (const x of action.rootState.modal.data.tags) {
+          tags[x.key] = x.value;
+        }
+        await Axios.post(`${action.rootState.main.API_URL}/file/tags`, {
+          path: file.path,
+          data: JSON.stringify(tags),
+        });
+      }
+
       await action.dispatch('getListSilent');
     },
   },
