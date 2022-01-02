@@ -139,6 +139,13 @@ export default defineComponent({
           }
         },
       },
+      {
+        icon: 'upload',
+        name: 'search',
+        onClick: () => {
+          this.$router.push('/db');
+        },
+      },
       /*{
         icon: 'info',
         name: 'Info',

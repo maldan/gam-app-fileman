@@ -1,5 +1,8 @@
 package api
 
+type ArgsSearch struct {
+	Query string `json:"query"`
+}
 type ArgsFileInfo struct {
 	Path string `json:"path"`
 	Data string `json:"data"`

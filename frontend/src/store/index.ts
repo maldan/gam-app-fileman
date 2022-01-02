@@ -1,22 +1,25 @@
 import { createStore, Store } from 'vuex';
 import main, { MainStore } from './main';
 import modal, { ModalStore } from '../gam_sdk_ui/vue/store/modal';
-import file from './file';
+import file, { FileStore } from './file';
 import tab from './tab';
 import extension from './extension';
+import search, { SearchStore } from './search';
 import { InjectionKey } from 'vue';
 
 // define your typings for the store state
 export interface MainTree {
   main: MainStore;
   modal: ModalStore;
+  search: SearchStore;
+  file: FileStore;
 }
 
 // define injection key
 export const key: InjectionKey<Store<MainTree>> = Symbol();
 
 export default createStore<MainTree>({
-  modules: { main, modal, file, tab, extension },
+  modules: { main, modal, file, tab, extension, search },
   /*state() {
     return {
       sortBy: 'name',

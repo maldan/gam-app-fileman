@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/Knetic/govaluate"
 	"github.com/maldan/gam-app-fileman/internal/app/fileman/core"
 	"github.com/maldan/go-cmhp/cmhp_crypto"
 	"github.com/maldan/go-cmhp/cmhp_file"
@@ -12,6 +13,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -100,17 +102,85 @@ func (f FileApi) PostSetVideoPreview(args ArgsVideoPreview) {
 	f.PostTags(ArgsTags{Path: args.Path, Tags: tags})
 }
 
-// Get file content
+// GetFile Get file content
 func (f FileApi) GetFile(ctx *rapi_core.Context, args core.Path) string {
 	ctx.IsServeFile = true
 	return args.Path
 }
 
-// Get file content
+// GetDirSize Get file content
 func (f FileApi) GetDirSize(args core.Path) int64 {
 	out, _ := cmhp_process.Exec("du", "-d", "0", "-b", args.Path)
 	i, _ := strconv.ParseInt(strings.Split(out, "\t")[0], 10, 64)
 	return i
+}
+
+// GetSearch Get list
+func (f FileApi) GetSearch(args ArgsSearch) []core.File {
+	out := make([]core.File, 0)
+
+	err := filepath.Walk(core.AppConfig.ThumbnailCachePath+"/tags",
+		func(p string, file os.FileInfo, err error) error {
+			if err != nil {
+				return nil
+			}
+			if file.IsDir() {
+				return nil
+			}
+
+			tags := make(map[string]interface{})
+			err = cmhp_file.ReadJSON(p, &tags)
+			if err != nil {
+				return nil
+			}
+
+			_, ok := tags["path"]
+			if !ok {
+				return nil
+			}
+
+			// Create file
+			filePath := tags["path"].(string)
+
+			// Tags search
+			expression, err := govaluate.NewEvaluableExpression(args.Query)
+			if err != nil {
+				return nil
+			}
+
+			result, err := expression.Evaluate(tags)
+			if err != nil {
+				return nil
+			}
+
+			if !result.(bool) {
+				return nil
+			}
+
+			// Get file info
+			fileInfo, err := cmhp_file.Info(filePath)
+			if err != nil {
+				return nil
+			}
+
+			outFile := core.File{
+				Path:    filePath,
+				Name:    path.Base(filePath),
+				User:    "",
+				Kind:    "file",
+				Size:    fileInfo.Size(),
+				Created: fileInfo.ModTime(),
+				Tags:    tags,
+			}
+
+			// Append
+			out = append(out, outFile)
+
+			return nil
+		})
+	rapi_core.FatalIfError(err)
+
+	return out
 }
 
 // GetList Get list

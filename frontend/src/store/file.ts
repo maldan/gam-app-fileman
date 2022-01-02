@@ -55,6 +55,9 @@ export default {
     },
   },
   actions: {
+    async clearList(action: FileActionContext): Promise<void> {
+      action.commit('SET_FILES', []);
+    },
     async getList({ commit, dispatch, rootState }: any) {
       dispatch('main/setLoading', true, { root: true });
       const files = await RestApi.file.getList(rootState.main.path);
@@ -229,7 +232,7 @@ export default {
         for (const x of action.rootState.modal.data.tags) {
           if (x.value === 'true') tags[x.key] = true;
           else if (x.value === 'false') tags[x.key] = false;
-          else if (x.value.match(/^-?\d+$/)) {
+          else if (typeof x.value === 'string' && x.value.match(/^[+-]?\d+(\.\d+)?$/)) {
             tags[x.key] = Number.parseFloat(x.value);
           } else tags[x.key] = x.value;
         }

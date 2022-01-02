@@ -8,10 +8,6 @@
       :src="`${$root.API_URL}/file/file?path=${$store.state.extension.data.fullPath}`"
     ></video>
 
-    <!-- Top -->
-    <!-- <IconButton class="close" icon="close" @click="$emit('close')" />
-    <IconButton class="left" icon="left" @click="prev()" />
-    <IconButton class="right" icon="right" @click="next()" /> -->
     <img
       class="close clickable"
       src="../../asset/icon/close.svg"
@@ -87,21 +83,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Moment from 'moment';
-import { RestApi } from '../../util/RestApi';
 
 export default defineComponent({
-  props: {
-    //path: String,
-    //list: Array,
-    //file: String,
-  },
+  props: {},
   components: {},
   async mounted() {
-    //const index = (this.list as any[]).findIndex((x) => this.path + '/' + x.name === this.file);
-    //if (index !== -1) {
-    //  this.currentId = index;
-    //}
-    console.log(this.$refs['video']);
     setInterval(() => {
       const video = this.$refs['video'] as HTMLVideoElement;
 
@@ -126,30 +112,11 @@ export default defineComponent({
         }
       }
     });
-
-    // Get file info
-    try {
-      this.info = await RestApi.file.getInfo(this.$store.state.extension.data.fullPath);
-      this.bookmark = this.info.bookmark || [];
-      console.log(this.info);
-    } catch (e) {}
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.keyEvents);
   },
   methods: {
-    /* prev() {
-      this.currentId -= 1;
-      if (this.currentId <= 0) {
-        this.currentId = 0;
-      }
-    },
-    next() {
-      this.currentId += 1;
-      if (this.currentId > (this.list as any[]).length - 1) {
-        this.currentId = (this.list as any[]).length - 1;
-      }
-    }, */
     changeOffset(x: number) {
       if (x < 0.5) {
         this.offset(-(this.$refs['video'] as any).playbackRate * 5);
@@ -207,11 +174,6 @@ export default defineComponent({
     changeVolume(amount: number) {
       const video = this.$refs['video'] as HTMLVideoElement;
       video.volume += amount;
-    },
-    async saveInfo() {
-      await RestApi.file.saveInfo(this.$store.state.extension.data.fullPath, {
-        bookmark: this.bookmark,
-      });
     },
   },
   data: () => {

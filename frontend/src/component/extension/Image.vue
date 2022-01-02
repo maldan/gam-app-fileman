@@ -6,63 +6,23 @@
       @click="$store.dispatch('extension/close')"
     />
     <img class="mode clickable" src="../../asset/icon/mode.svg" @click="isWidth = !isWidth" />
-    <!-- <IconButton class="close" icon="close" @click="$emit('close')" />
-    <IconButton class="mode" icon="mode" @click="isWidth = !isWidth" /> -->
-    <!-- <IconButton class="left" icon="left" @click="prev()" />
-    <IconButton class="right" icon="right" @click="next()" /> -->
 
     <div ref="slider" class="swipe">
       <div class="swipe-wrap">
-        <!-- <div>1</div>
-        <div>
-          <img
-            class="image"
-            :src="$root.API_URL + `/file/file?path=${path + '/' + list[currentId].name}`"
-            :style="isWidth ? { width: '100%' } : { height: '100%' }"
-            draggable="false"
-          />
-        </div>
-        <div>2</div> -->
-
         <div v-for="(x, i) in $store.state.file.list" :key="x.name">
           <img
             class="image"
-            :data-src="$root.API_URL + `/file/file?path=${$store.state.main.path + '/' + x.name}`"
+            :data-src="$root.API_URL + `/file/file?path=${x.path}`"
             :style="isWidth ? { width: '100%' } : { height: '100%' }"
             draggable="false"
             loading="lazy"
             :src="
               i === $store.state.extension.data.index
-                ? $root.API_URL + `/file/file?path=${$store.state.main.path + '/' + x.name}`
+                ? $root.API_URL + `/file/file?path=${x.path}`
                 : ''
             "
           />
         </div>
-
-        <!-- <div>
-          <img
-            class="image"
-            :src="$root.API_URL + `/file/file?path=${prev()}`"
-            :style="isWidth ? { width: '100%' } : { height: '100%' }"
-            draggable="false"
-          />
-        </div>
-        <div>
-          <img
-            class="image"
-            :src="$root.API_URL + `/file/file?path=${current()}`"
-            :style="isWidth ? { width: '100%' } : { height: '100%' }"
-            draggable="false"
-          />
-        </div>
-        <div>
-          <img
-            class="image"
-            :src="$root.API_URL + `/file/file?path=${next()}`"
-            :style="isWidth ? { width: '100%' } : { height: '100%' }"
-            draggable="false"
-          />
-        </div>-->
       </div>
     </div>
   </div>

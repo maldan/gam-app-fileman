@@ -81,7 +81,7 @@ export default defineComponent({
             name: 'image',
             data: {
               index: this.file.index,
-              fullPath: this.$store.state.main.path + '/' + this.file.name,
+              fullPath: this.file.path,
             },
           });
         } else if (this.file.name.match(/\.(mp4|avi)$/)) {
@@ -89,16 +89,11 @@ export default defineComponent({
             name: 'video',
             data: {
               index: this.file.index,
-              fullPath: this.$store.state.main.path + '/' + this.file.name,
+              fullPath: this.file.path,
             },
           });
         } else {
-          window.open(
-            `${(this.$root as any).API_URL}/file/file?path=${
-              this.$store.state.main.path + '/' + this.file.name
-            }`,
-            '_blank',
-          );
+          window.open(`${(this.$root as any).API_URL}/file/file?path=${this.file.path}`, '_blank');
         }
       }
     },
