@@ -9,8 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "web-types": [
-    "./src/gam_sdk_ui/vue/component.web-types.json",
-    "./src/gam_sdk_ui/vue/icon.web-types.json"
+    "./src/gam_sdk_ui/vue/component.web-types.json"
   ],
   "dependencies": {
     "axios": "^0.21.1",

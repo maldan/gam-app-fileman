@@ -1,16 +1,26 @@
 <template>
-  <ui-block>
+  <ui-block :class="$style.content">
     <div :class="$style.header">
-      <div>/home/maldan/sasageo/davageo/vrotberageo</div>
+      <div :class="$style.path">
+        <ui-button
+          v-for="(x, i) in pathParts"
+          :text="x"
+          :key="i"
+          :isSelected="i === pathParts.length - 1"
+        />
+      </div>
       <div :class="$style.sys" class="button_group_round_compact">
-        <ui-button icon="pencil" />
-        <ui-button icon="pencil" />
+        <ui-button icon="control_panel" :isSelected="true" />
+        <ui-button icon="list" />
       </div>
     </div>
     <div :class="$style.fileList">
       <explorer-file v-for="x in 24" :key="x" :file="{ name: 'sas' }" />
     </div>
-    <div>Stat: 20 selected, sort by name</div>
+    <div :class="$style.footer" class="button_group_round_compact">
+      <ui-button text="By Name" />
+      <ui-button text="0 / 20" />
+    </div>
   </ui-block>
 </template>
 
@@ -21,6 +31,13 @@ export default defineComponent({
   props: {
     path: String,
   },
+  computed: {
+    pathParts() {
+      const x = '/home/maldan/sasageo/davageo/vrotberageo'.split('/');
+      x[0] = '/';
+      return x;
+    },
+  },
   async mounted() {},
   methods: {},
   data: () => {
@@ -30,18 +47,34 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
+.content {
+  button {
+    padding: 5px;
+    font-size: 14px;
+    font-weight: normal;
+  }
+
+  .footer {
+    display: flex;
+  }
+}
+
 .header {
   display: flex;
   align-items: center;
+
+  .path {
+    display: flex;
+
+    button {
+      margin-right: 5px;
+    }
+  }
 }
 
 .sys {
   width: max-content;
   margin-left: auto;
-
-  button {
-    padding: 5px;
-  }
 }
 
 .fileList {
