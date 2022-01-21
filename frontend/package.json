@@ -8,6 +8,10 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
+  "web-types": [
+    "./src/gam_sdk_ui/vue/component.web-types.json",
+    "./src/gam_sdk_ui/vue/icon.web-types.json"
+  ],
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
@@ -17,6 +21,7 @@
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
     "vue-click": "^2.1.4",
+    "vue-docgen-web-types": "^0.1.7",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.2"
   },
