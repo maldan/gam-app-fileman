@@ -10,6 +10,7 @@ import (
 	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
 	"github.com/maldan/go-restserver"
+	"html"
 	"os"
 	"os/user"
 	"path"
@@ -143,7 +144,7 @@ func (f FileApi) GetSearch(args ArgsSearch) []core.File {
 			filePath := tags["path"].(string)
 
 			// Tags search
-			expression, err := govaluate.NewEvaluableExpression(args.Query)
+			expression, err := govaluate.NewEvaluableExpression(html.UnescapeString(args.Query))
 			if err != nil {
 				return nil
 			}
@@ -285,7 +286,7 @@ func (f FileApi) DeleteFile(args core.CreateFile) {
 
 // Delete dir
 func (f FileApi) DeleteDir(args core.CreateFile) {
-	if cmhp_slice.Includes([]interface{}{
+	if cmhp_slice.Includes([]string{
 		"/", "/home", "/root", "/var", "/www", "/etc", "/bin", "/boot", "/mnt", "/media",
 		"/var", "/usr", "/tmp",
 	}, args.Path) {
@@ -421,7 +422,7 @@ func (f FileApi) PostSetHashName(args core.Path) {
 	} else if mimeType == "video/mp4" || mimeType == "video/quicktime" {
 		finalName = hashName + ".mp4"
 	} else {
-		rapi_core.Fatal(rapi_core.Error{Code: 500, Description: "Unsupported file format"})
+		rapi_core.Fatal(rapi_core.Error{Code: 500, Description: fmt.Sprintf("%v - %v", mimeType, "Unsupported file format")})
 	}
 
 	// Check if file already exists

@@ -57,3 +57,4 @@ type Config struct {
 var DataDir = ""
 var Host = ""
 var AppConfig Config
+var README = ""

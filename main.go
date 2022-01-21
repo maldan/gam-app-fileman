@@ -9,6 +9,9 @@ import (
 //go:embed frontend/build/*
 var frontFs embed.FS
 
+//go:embed README.md
+var readme string
+
 func main() {
-	helloworld.Start(frontFs) //
+	helloworld.Start(frontFs, readme) //
 }

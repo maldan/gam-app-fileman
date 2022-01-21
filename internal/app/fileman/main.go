@@ -15,7 +15,7 @@ import (
 	"github.com/maldan/go-rapi/rapi_vfs"
 )
 
-func Start(frontFs embed.FS) {
+func Start(frontFs embed.FS, readme string) {
 	// Server
 	var host = flag.String("host", "127.0.0.1", "Server Hostname")
 	var port = flag.Int("port", 16000, "Server Port")
@@ -29,6 +29,7 @@ func Start(frontFs embed.FS) {
 	// Set
 	core.DataDir = *dataDir
 	core.Host = *host
+	core.README = readme
 
 	// Read config
 	_ = cmhp_file.ReadJSON(core.DataDir+"/config.json", &core.AppConfig)
@@ -53,6 +54,7 @@ func Start(frontFs embed.FS) {
 			"/system": rapi_rest.ApiHandler{
 				Controller: map[string]interface{}{
 					"signal": api.SignalApi{},
+					"info":   api.InfoApi{},
 				},
 			},
 		},

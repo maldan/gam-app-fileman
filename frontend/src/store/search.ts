@@ -19,7 +19,9 @@ export default {
   actions: {
     async search(action: SearchActionContext): Promise<void> {
       const list = (
-        await Axios.get(`${action.rootState.main.API_URL}/file/search?query=${action.state.query}`)
+        await Axios.get(
+          `${action.rootState.main.API_URL}/file/search?query=${escape(action.state.query)}`,
+        )
       ).data.response;
       action.commit(
         'file/SET_FILES',

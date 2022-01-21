@@ -1,5 +1,7 @@
 package api
 
+type ArgsNone struct {
+}
 type ArgsSearch struct {
 	Query string `json:"query"`
 }

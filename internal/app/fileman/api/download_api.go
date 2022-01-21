@@ -76,6 +76,11 @@ func (r DownloadApi) PostIndex(args core.Download) {
 		return
 	}
 
+	if strings.Contains(args.Url, ".m3u8") {
+		go plugin.DownloadM3U8(&args, semaphoreChan)
+		return
+	}
+
 	restserver.Fatal(500, restserver.ErrorType.Unknown, "url", "Url not supported")
 }
 
