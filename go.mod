@@ -11,5 +11,4 @@ require (
 	github.com/h2non/filetype v1.1.3
 	github.com/maldan/go-cmhp v0.0.20
 	github.com/maldan/go-rapi v0.0.6
-	github.com/maldan/go-restserver v1.2.10
 )

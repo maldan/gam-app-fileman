@@ -7,7 +7,6 @@ import (
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"os"
 
-	"github.com/maldan/gam-app-fileman/internal/app/fileman/api"
 	"github.com/maldan/gam-app-fileman/internal/app/fileman/core"
 	"github.com/maldan/go-rapi"
 	"github.com/maldan/go-rapi/rapi_core"
@@ -28,7 +27,6 @@ func Start(frontFs embed.FS) {
 
 	// Set
 	core.DataDir = *dataDir
-	core.Host = *host
 
 	// Read config
 	_ = cmhp_file.ReadJSON(core.DataDir+"/config.json", &core.AppConfig)
@@ -45,14 +43,14 @@ func Start(frontFs embed.FS) {
 			},
 			"/api": rapi_rest.ApiHandler{
 				Controller: map[string]interface{}{
-					"file":     api.FileApi{},
-					"download": api.DownloadApi{},
-					"disk":     api.DiskApi{},
+					//"file":     api.FileApi{},
+					//"download": api.DownloadApi{},
+					//"disk":     api.DiskApi{},
 				},
 			},
 			"/system": rapi_rest.ApiHandler{
 				Controller: map[string]interface{}{
-					"signal": api.SignalApi{},
+					//"signal": api.SignalApi{},
 				},
 			},
 		},

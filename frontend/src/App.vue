@@ -15,9 +15,6 @@ export default defineComponent({
     return {
       moment: Moment,
       pretty: PrettyBytes,
-      // @ts-ignore
-      API_URL: process.env.VUE_APP_API_URL || `${window.location.origin}/api`,
-      selectedFiles: [],
       log: console.log,
     };
   },
